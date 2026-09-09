@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -375,14 +376,12 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
               </div>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="button"
-                  disabled
-                  className="flex-1 cursor-not-allowed rounded-xl bg-violet-600/40 px-4 py-3 text-sm font-bold text-white/60"
+                <Link
+                  href={`/decks/${deck.id}`}
+                  className="flex-1 rounded-xl bg-violet-600 px-4 py-3 text-center text-sm font-bold text-white hover:bg-violet-500"
                 >
                   Montar deck
-                </button>
-
+                </Link>
                 <button
                   type="button"
                   disabled={deletingId === deck.id}
