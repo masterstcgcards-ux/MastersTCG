@@ -10,15 +10,6 @@ export const metadata = {
   title: "Minha coleção | MastersTCG",
 };
 
-const conditions: Record<string, string> = {
-  mint: "Impecável",
-  near_mint: "Quase impecável",
-  excellent: "Excelente",
-  good: "Bom",
-  played: "Com desgaste",
-  poor: "Muito danificada",
-};
-
 async function CollectionContent() {
   const supabase = await createClient();
 
@@ -39,46 +30,59 @@ async function CollectionContent() {
       set_name,
       card_number,
       card_condition,
+      language,
       quantity,
-      front_image_path
-    `,
+      front_image_path,
+      created_at
+      `,
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  const collection = await Promise.all(
+  const cardsWithImages = await Promise.all(
     (cards ?? []).map(async (card) => {
       let imageUrl: string | null = null;
 
-      // Só solicita imagens da pasta deste usuário.
-      if (card.front_image_path?.startsWith(`${user.id}/`)) {
-        const { data, error: imageError } = await supabase.storage
+      if (
+        card.front_image_path &&
+        card.front_image_path.startsWith(`${user.id}/`)
+      ) {
+        const { data: signedImage } = await supabase.storage
           .from("card-scans")
           .createSignedUrl(card.front_image_path, 3600);
 
-        if (!imageError && data) {
-          imageUrl = data.signedUrl;
-        }
+        imageUrl = signedImage?.signedUrl ?? null;
       }
 
-      return { ...card, imageUrl };
+      return {
+        ...card,
+        imageUrl,
+      };
     }),
   );
 
-  const total = collection.reduce((sum, card) => sum + card.quantity, 0);
+  const totalCards = cardsWithImages.reduce(
+    (total, card) => total + (card.quantity ?? 0),
+    0,
+  );
 
   return (
     <main className="min-h-screen bg-[#09090f] text-white">
       <header className="border-b border-white/10 bg-[#0d0d16]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
-          <Link href="/" className="text-xl font-black tracking-tight">
-            MASTERS<span className="text-violet-500">TCG</span>
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-6 py-4">
+          <Link
+            href="/"
+            aria-label="MastersTCG — início"
+            className="text-xl font-black tracking-tight"
+          >
+            MASTERS<span className="text-violet-400">TCG</span>
           </Link>
 
           <nav className="hidden items-center gap-6 text-sm text-zinc-400 md:flex">
             <span className="font-semibold text-white">Minha coleção</span>
             <span>Marketplace · Em breve</span>
             <span>Arena · Em breve</span>
+
             <span className="rounded-full bg-violet-500/10 px-3 py-1 text-xs text-violet-300">
               Pokémon
             </span>
@@ -89,7 +93,7 @@ async function CollectionContent() {
       </header>
 
       <section className="mx-auto max-w-7xl px-6 py-10">
-        <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+        <div className="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-violet-400">
               Área do Master
@@ -99,14 +103,14 @@ async function CollectionContent() {
               Minha coleção
             </h1>
 
-            <p className="mt-3 text-zinc-400">
-              Cadastre, organize e acompanhe as cartas da sua coleção.
+            <p className="mt-3 max-w-2xl text-zinc-400">
+              Cadastre, organize e acompanhe todas as cartas da sua coleção.
             </p>
 
-            {!error && (
-              <p className="mt-4 text-sm text-violet-300">
-                {total} {total === 1 ? "carta" : "cartas"} · {collection.length}{" "}
-                {collection.length === 1 ? "cadastro" : "cadastros"}
+            {!error && cardsWithImages.length > 0 && (
+              <p className="mt-4 text-sm font-semibold text-violet-300">
+                {totalCards}{" "}
+                {totalCards === 1 ? "carta cadastrada" : "cartas cadastradas"}
               </p>
             )}
           </div>
@@ -120,21 +124,14 @@ async function CollectionContent() {
         </div>
 
         {error && (
-          <div
-            role="alert"
-            className="rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-red-200"
-          >
-            Não foi possível carregar sua coleção. Atualize a página para tentar
-            novamente.
+          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-red-200">
+            Não foi possível carregar sua coleção.
           </div>
         )}
 
-        {!error && collection.length === 0 && (
+        {!error && cardsWithImages.length === 0 && (
           <div className="flex min-h-[420px] flex-col items-center justify-center rounded-3xl border border-dashed border-white/15 bg-white/[0.025] p-8 text-center">
-            <div
-              aria-hidden="true"
-              className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-violet-500/10 text-4xl"
-            >
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-violet-500/10 text-4xl">
               ◈
             </div>
 
@@ -142,7 +139,7 @@ async function CollectionContent() {
 
             <p className="mt-3 max-w-md text-zinc-400">
               Envie uma foto da sua primeira carta Pokémon e preencha os dados
-              para adicioná-la à coleção.
+              para adicioná-la à sua coleção.
             </p>
 
             <Button
@@ -154,53 +151,54 @@ async function CollectionContent() {
           </div>
         )}
 
-        {!error && collection.length > 0 && (
+        {!error && cardsWithImages.length > 0 && (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {collection.map((card) => (
-              <article
+            {cardsWithImages.map((card) => (
+              <Link
                 key={card.id}
-                className="overflow-hidden rounded-2xl border border-white/10 bg-[#13131d]"
+                href={`/collection/${card.id}`}
+                className="group block"
               >
-                <div className="flex aspect-[2.5/3.5] items-center justify-center bg-[#0d0d16] p-3">
-                  {card.imageUrl ? (
-                    // URL temporária da foto privada.
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={card.imageUrl}
-                      alt={`Foto de ${card.card_name || "carta"}`}
-                      loading="lazy"
-                      className="h-full w-full rounded-lg object-contain"
-                    />
-                  ) : (
-                    <p className="px-4 text-center text-sm text-zinc-500">
-                      Foto indisponível. Tente atualizar a página.
-                    </p>
-                  )}
-                </div>
-
-                <div className="p-5">
-                  <h2 className="text-lg font-bold">
-                    {card.card_name || "Carta sem nome"}
-                  </h2>
-
-                  <p className="mt-1 text-sm text-zinc-400">
-                    {card.set_name || "Coleção não informada"}
-                    {card.card_number ? ` • ${card.card_number}` : ""}
-                  </p>
-
-                  <div className="mt-4 flex items-center justify-between gap-2 text-xs">
-                    <span className="rounded-full bg-violet-500/10 px-3 py-1 text-violet-300">
-                      {conditions[card.card_condition] ||
-                        "Estado não informado"}
-                    </span>
-
-                    <span className="text-zinc-400">
-                      {card.quantity}{" "}
-                      {card.quantity === 1 ? "unidade" : "unidades"}
-                    </span>
+                <article className="h-full overflow-hidden rounded-2xl border border-white/10 bg-[#13131d] transition duration-200 group-hover:-translate-y-1 group-hover:border-violet-500/60 group-hover:shadow-xl group-hover:shadow-violet-950/30">
+                  <div className="flex aspect-[2.5/3.5] items-center justify-center overflow-hidden bg-gradient-to-br from-violet-950 to-zinc-950">
+                    {card.imageUrl ? (
+                      <img
+                        src={card.imageUrl}
+                        alt={`Foto da carta ${card.card_name || ""}`}
+                        className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]"
+                      />
+                    ) : (
+                      <span className="text-zinc-500">Imagem da carta</span>
+                    )}
                   </div>
-                </div>
-              </article>
+
+                  <div className="p-5">
+                    <h2 className="font-bold">
+                      {card.card_name || "Carta sem nome"}
+                    </h2>
+
+                    <p className="mt-1 text-sm text-zinc-400">
+                      {card.set_name || "Coleção não informada"}
+                      {card.card_number ? ` • ${card.card_number}` : ""}
+                    </p>
+
+                    <div className="mt-4 flex justify-between gap-3 text-xs text-zinc-500">
+                      <span>
+                        {card.card_condition || "Estado não informado"}
+                      </span>
+
+                      <span>
+                        {card.quantity}{" "}
+                        {card.quantity === 1 ? "unidade" : "unidades"}
+                      </span>
+                    </div>
+
+                    <p className="mt-4 text-sm font-semibold text-violet-400">
+                      Ver detalhes →
+                    </p>
+                  </div>
+                </article>
+              </Link>
             ))}
           </div>
         )}
@@ -212,9 +210,7 @@ async function CollectionContent() {
 function CollectionLoading() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#09090f] text-white">
-      <p role="status" className="text-zinc-400">
-        Carregando sua coleção...
-      </p>
+      <p className="text-zinc-400">Carregando coleção...</p>
     </main>
   );
 }
