@@ -83,7 +83,9 @@ async function CollectionContent() {
 
           <nav className="hidden items-center gap-6 text-sm text-zinc-400 md:flex">
             <span className="font-semibold text-white">Minha coleção</span>
-
+            <Link href="/profile" className="hover:text-white">
+              Meu perfil
+            </Link>
             <span>Marketplace · Em breve</span>
             <span>Arena · Em breve</span>
 
