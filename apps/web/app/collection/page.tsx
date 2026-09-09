@@ -2,8 +2,9 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import { CollectionBrowser } from "@/components/collection-browser";
 import { LogoutButton } from "@/components/logout-button";
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
@@ -21,6 +22,8 @@ async function CollectionContent() {
     redirect("/auth/login");
   }
 
+  const userId = user.id;
+
   const { data: cards, error } = await supabase
     .from("user_cards")
     .select(
@@ -36,7 +39,7 @@ async function CollectionContent() {
       created_at
       `,
     )
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   const cardsWithImages = await Promise.all(
@@ -45,7 +48,7 @@ async function CollectionContent() {
 
       if (
         card.front_image_path &&
-        card.front_image_path.startsWith(`${user.id}/`)
+        card.front_image_path.startsWith(`${userId}/`)
       ) {
         const { data: signedImage } = await supabase.storage
           .from("card-scans")
@@ -80,6 +83,7 @@ async function CollectionContent() {
 
           <nav className="hidden items-center gap-6 text-sm text-zinc-400 md:flex">
             <span className="font-semibold text-white">Minha coleção</span>
+
             <span>Marketplace · Em breve</span>
             <span>Arena · Em breve</span>
 
@@ -138,8 +142,8 @@ async function CollectionContent() {
             <h2 className="text-2xl font-bold">Sua coleção começa aqui</h2>
 
             <p className="mt-3 max-w-md text-zinc-400">
-              Envie uma foto da sua primeira carta Pokémon e preencha os dados
-              para adicioná-la à sua coleção.
+              Envie fotos da sua primeira carta Pokémon e preencha os dados para
+              adicioná-la à sua coleção.
             </p>
 
             <Button
@@ -152,55 +156,7 @@ async function CollectionContent() {
         )}
 
         {!error && cardsWithImages.length > 0 && (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {cardsWithImages.map((card) => (
-              <Link
-                key={card.id}
-                href={`/collection/${card.id}`}
-                className="group block"
-              >
-                <article className="h-full overflow-hidden rounded-2xl border border-white/10 bg-[#13131d] transition duration-200 group-hover:-translate-y-1 group-hover:border-violet-500/60 group-hover:shadow-xl group-hover:shadow-violet-950/30">
-                  <div className="flex aspect-[2.5/3.5] items-center justify-center overflow-hidden bg-gradient-to-br from-violet-950 to-zinc-950">
-                    {card.imageUrl ? (
-                      <img
-                        src={card.imageUrl}
-                        alt={`Foto da carta ${card.card_name || ""}`}
-                        className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]"
-                      />
-                    ) : (
-                      <span className="text-zinc-500">Imagem da carta</span>
-                    )}
-                  </div>
-
-                  <div className="p-5">
-                    <h2 className="font-bold">
-                      {card.card_name || "Carta sem nome"}
-                    </h2>
-
-                    <p className="mt-1 text-sm text-zinc-400">
-                      {card.set_name || "Coleção não informada"}
-                      {card.card_number ? ` • ${card.card_number}` : ""}
-                    </p>
-
-                    <div className="mt-4 flex justify-between gap-3 text-xs text-zinc-500">
-                      <span>
-                        {card.card_condition || "Estado não informado"}
-                      </span>
-
-                      <span>
-                        {card.quantity}{" "}
-                        {card.quantity === 1 ? "unidade" : "unidades"}
-                      </span>
-                    </div>
-
-                    <p className="mt-4 text-sm font-semibold text-violet-400">
-                      Ver detalhes →
-                    </p>
-                  </div>
-                </article>
-              </Link>
-            ))}
-          </div>
+          <CollectionBrowser cards={cardsWithImages} />
         )}
       </section>
     </main>
