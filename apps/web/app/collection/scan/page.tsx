@@ -15,25 +15,51 @@ const extensions: Record<string, string> = {
   "image/webp": "webp",
 };
 
+function validateImage(file: File, imageName: string) {
+  if (!extensions[file.type]) {
+    return `${imageName}: use uma imagem JPG, PNG ou WebP. HEIC ainda não é aceito.`;
+  }
+
+  if (file.size === 0 || file.size > 10 * 1024 * 1024) {
+    return `${imageName}: a imagem deve ter conteúdo e no máximo 10 MB.`;
+  }
+
+  return null;
+}
+
 export default function ScanPage() {
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [preview, setPreview] = useState("");
+  const [frontPhoto, setFrontPhoto] = useState<File | null>(null);
+  const [backPhoto, setBackPhoto] = useState<File | null>(null);
+  const [frontPreview, setFrontPreview] = useState("");
+  const [backPreview, setBackPreview] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
   const submitting = useRef(false);
 
   useEffect(() => {
-    if (!photo) {
-      setPreview("");
+    if (!frontPhoto) {
+      setFrontPreview("");
       return;
     }
 
-    const url = URL.createObjectURL(photo);
-    setPreview(url);
+    const url = URL.createObjectURL(frontPhoto);
+    setFrontPreview(url);
 
     return () => URL.revokeObjectURL(url);
-  }, [photo]);
+  }, [frontPhoto]);
+
+  useEffect(() => {
+    if (!backPhoto) {
+      setBackPreview("");
+      return;
+    }
+
+    const url = URL.createObjectURL(backPhoto);
+    setBackPreview(url);
+
+    return () => URL.revokeObjectURL(url);
+  }, [backPhoto]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -51,21 +77,25 @@ export default function ScanPage() {
       return;
     }
 
-    if (!photo) {
+    if (!frontPhoto) {
       setMessage("Selecione uma foto da frente da carta.");
       return;
     }
 
-    const extension = extensions[photo.type];
+    const frontValidation = validateImage(frontPhoto, "Foto da frente");
 
-    if (!extension) {
-      setMessage("Use uma imagem JPG, PNG ou WebP. HEIC ainda não é aceito.");
+    if (frontValidation) {
+      setMessage(frontValidation);
       return;
     }
 
-    if (photo.size === 0 || photo.size > 10 * 1024 * 1024) {
-      setMessage("A imagem deve ter conteúdo e no máximo 10 MB.");
-      return;
+    if (backPhoto) {
+      const backValidation = validateImage(backPhoto, "Foto do verso");
+
+      if (backValidation) {
+        setMessage(backValidation);
+        return;
+      }
     }
 
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 999) {
@@ -76,9 +106,10 @@ export default function ScanPage() {
     submitting.current = true;
     setSaving(true);
 
-    try {
-      const supabase = createClient();
+    const supabase = createClient();
+    const uploadedPaths: string[] = [];
 
+    try {
       const {
         data: { user },
         error: authError,
@@ -91,19 +122,44 @@ export default function ScanPage() {
       }
 
       const cardId = crypto.randomUUID();
-      const imagePath = `${user.id}/${cardId}/front.${extension}`;
+      const frontExtension = extensions[frontPhoto.type];
+      const frontImagePath = `${user.id}/${cardId}/front.${frontExtension}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: frontUploadError } = await supabase.storage
         .from("card-scans")
-        .upload(imagePath, photo, {
-          contentType: photo.type,
+        .upload(frontImagePath, frontPhoto, {
+          contentType: frontPhoto.type,
           upsert: false,
         });
 
-      if (uploadError) {
+      if (frontUploadError) {
         throw new Error(
-          `Não foi possível enviar a foto: ${uploadError.message}`,
+          `Não foi possível enviar a foto da frente: ${frontUploadError.message}`,
         );
+      }
+
+      uploadedPaths.push(frontImagePath);
+
+      let backImagePath: string | null = null;
+
+      if (backPhoto) {
+        const backExtension = extensions[backPhoto.type];
+        backImagePath = `${user.id}/${cardId}/back.${backExtension}`;
+
+        const { error: backUploadError } = await supabase.storage
+          .from("card-scans")
+          .upload(backImagePath, backPhoto, {
+            contentType: backPhoto.type,
+            upsert: false,
+          });
+
+        if (backUploadError) {
+          throw new Error(
+            `Não foi possível enviar a foto do verso: ${backUploadError.message}`,
+          );
+        }
+
+        uploadedPaths.push(backImagePath);
       }
 
       const { error: insertError } = await supabase.from("user_cards").insert({
@@ -117,28 +173,25 @@ export default function ScanPage() {
         language: String(form.get("language")),
         finish: String(form.get("finish")),
         notes: String(form.get("notes") || "").trim() || null,
-        front_image_path: imagePath,
+        front_image_path: frontImagePath,
+        back_image_path: backImagePath,
         source: "manual",
       });
 
       if (insertError) {
-        // Remove somente a foto desta tentativa se o cadastro falhar.
-        const { error: cleanupError } = await supabase.storage
-          .from("card-scans")
-          .remove([imagePath]);
-
         throw new Error(
-          `Não foi possível salvar a carta: ${insertError.message}${
-            cleanupError
-              ? " A foto ficou armazenada sem cadastro; avise antes de tentar novamente."
-              : ""
-          }`,
+          `Não foi possível salvar a carta: ${insertError.message}`,
         );
       }
 
+      uploadedPaths.length = 0;
       setSuccess(true);
       setMessage("Carta adicionada à sua coleção!");
     } catch (error) {
+      if (uploadedPaths.length > 0) {
+        await supabase.storage.from("card-scans").remove(uploadedPaths);
+      }
+
       setMessage(
         error instanceof Error
           ? error.message
@@ -153,7 +206,7 @@ export default function ScanPage() {
   return (
     <main className="min-h-screen bg-[#09090f] text-white">
       <header className="border-b border-white/10">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <Link
             href="/collection"
             className="text-xl font-black tracking-tight"
@@ -170,7 +223,7 @@ export default function ScanPage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-5xl px-6 py-10">
+      <section className="mx-auto max-w-6xl px-6 py-10">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-400">
           Pokémon TCG
         </p>
@@ -180,8 +233,8 @@ export default function ScanPage() {
         </h1>
 
         <p className="mt-3 max-w-2xl text-zinc-400">
-          Envie uma foto nítida da frente da carta e preencha os dados. Nesta
-          versão, o cadastro é manual e a foto permanece privada.
+          Envie uma foto nítida da frente e, se desejar, do verso da carta. As
+          imagens permanecem privadas na sua coleção.
         </p>
 
         {success ? (
@@ -191,64 +244,101 @@ export default function ScanPage() {
             </p>
 
             <p className="mt-3 text-zinc-300">
-              Os dados e a foto foram salvos.
+              Os dados e as fotos foram salvos.
             </p>
 
-            <a
+            <Link
               href="/collection"
               className="mt-6 inline-block rounded-xl bg-violet-600 px-6 py-3 font-bold text-white hover:bg-violet-500"
             >
               Ver minha coleção
-            </a>
+            </Link>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mt-8">
             <fieldset
               disabled={saving}
-              className="grid min-w-0 gap-8 disabled:opacity-70 md:grid-cols-2"
+              className="grid min-w-0 gap-8 disabled:opacity-70 lg:grid-cols-[1.2fr_0.8fr]"
             >
-              <div className="rounded-2xl border border-white/10 bg-[#11111b] p-6">
-                <label htmlFor="photo" className="block font-semibold">
-                  Foto da frente *
-                </label>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/10 bg-[#11111b] p-5">
+                  <label htmlFor="front_photo" className="block font-semibold">
+                    Foto da frente *
+                  </label>
 
-                <p className="mt-2 text-sm text-zinc-400">
-                  JPG, PNG ou WebP, até 10 MB. Evite reflexos e enquadre a carta
-                  inteira.
-                </p>
+                  <p className="mt-2 text-sm text-zinc-400">
+                    JPG, PNG ou WebP, até 10 MB.
+                  </p>
 
-                <input
-                  id="photo"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  required
-                  onChange={(event) => {
-                    setPhoto(event.target.files?.[0] || null);
-                    setMessage("");
-                  }}
-                  className="mt-5 block w-full text-sm text-zinc-300 file:mr-3 file:rounded-lg file:border-0 file:bg-violet-600 file:px-4 file:py-2 file:text-white"
-                />
+                  <input
+                    id="front_photo"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    required
+                    onChange={(event) => {
+                      setFrontPhoto(event.target.files?.[0] || null);
+                      setMessage("");
+                    }}
+                    className="mt-5 block w-full text-sm text-zinc-300 file:mr-3 file:rounded-lg file:border-0 file:bg-violet-600 file:px-4 file:py-2 file:text-white"
+                  />
 
-                <div className="mt-6 flex min-h-72 items-center justify-center overflow-hidden rounded-xl border border-dashed border-white/15 bg-black/20 p-4">
-                  {preview ? (
-                    // Prévia local do arquivo, sem publicar a imagem.
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={preview}
-                      alt="Prévia da carta selecionada"
-                      className="max-h-96 max-w-full rounded-lg object-contain"
-                    />
-                  ) : (
-                    <p className="text-center text-sm text-zinc-500">
-                      A prévia da foto aparecerá aqui.
-                    </p>
-                  )}
+                  <div className="mt-5 flex min-h-72 items-center justify-center overflow-hidden rounded-xl border border-dashed border-white/15 bg-black/20 p-4">
+                    {frontPreview ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={frontPreview}
+                        alt="Prévia da frente da carta"
+                        className="max-h-96 max-w-full rounded-lg object-contain"
+                      />
+                    ) : (
+                      <p className="text-center text-sm text-zinc-500">
+                        A frente da carta aparecerá aqui.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-[#11111b] p-5">
+                  <label htmlFor="back_photo" className="block font-semibold">
+                    Foto do verso
+                  </label>
+
+                  <p className="mt-2 text-sm text-zinc-400">
+                    Opcional. JPG, PNG ou WebP, até 10 MB.
+                  </p>
+
+                  <input
+                    id="back_photo"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(event) => {
+                      setBackPhoto(event.target.files?.[0] || null);
+                      setMessage("");
+                    }}
+                    className="mt-5 block w-full text-sm text-zinc-300 file:mr-3 file:rounded-lg file:border-0 file:bg-zinc-700 file:px-4 file:py-2 file:text-white"
+                  />
+
+                  <div className="mt-5 flex min-h-72 items-center justify-center overflow-hidden rounded-xl border border-dashed border-white/15 bg-black/20 p-4">
+                    {backPreview ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={backPreview}
+                        alt="Prévia do verso da carta"
+                        className="max-h-96 max-w-full rounded-lg object-contain"
+                      />
+                    ) : (
+                      <p className="text-center text-sm text-zinc-500">
+                        O verso é opcional e aparecerá aqui.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-5">
+              <div className="space-y-5 rounded-2xl border border-white/10 bg-[#11111b] p-6">
                 <div>
                   <label htmlFor="card_name">Nome da carta *</label>
+
                   <input
                     id="card_name"
                     name="card_name"
@@ -261,6 +351,7 @@ export default function ScanPage() {
 
                 <div>
                   <label htmlFor="set_name">Coleção / expansão</label>
+
                   <input
                     id="set_name"
                     name="set_name"
@@ -273,6 +364,7 @@ export default function ScanPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="card_number">Número</label>
+
                     <input
                       id="card_number"
                       name="card_number"
@@ -284,6 +376,7 @@ export default function ScanPage() {
 
                   <div>
                     <label htmlFor="quantity">Quantidade *</label>
+
                     <input
                       id="quantity"
                       name="quantity"
@@ -302,6 +395,7 @@ export default function ScanPage() {
                   <label htmlFor="card_condition">
                     Estado de conservação *
                   </label>
+
                   <select
                     id="card_condition"
                     name="card_condition"
@@ -326,6 +420,7 @@ export default function ScanPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="language">Idioma</label>
+
                     <select
                       id="language"
                       name="language"
@@ -342,6 +437,7 @@ export default function ScanPage() {
 
                   <div>
                     <label htmlFor="finish">Acabamento</label>
+
                     <select
                       id="finish"
                       name="finish"
@@ -358,41 +454,35 @@ export default function ScanPage() {
 
                 <div>
                   <label htmlFor="notes">Observações</label>
+
                   <textarea
                     id="notes"
                     name="notes"
-                    rows={3}
-                    maxLength={2000}
-                    placeholder="Detalhes sobre sua carta"
+                    rows={4}
+                    maxLength={1000}
+                    placeholder="Detalhes adicionais sobre a carta"
                     className={fieldClass}
                   />
                 </div>
 
+                {message && (
+                  <p
+                    role="alert"
+                    className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200"
+                  >
+                    {message}
+                  </p>
+                )}
+
                 <button
                   type="submit"
-                  className="w-full rounded-xl bg-violet-600 px-6 py-4 font-bold hover:bg-violet-500 disabled:cursor-wait"
+                  disabled={saving}
+                  className="w-full rounded-xl bg-violet-600 px-6 py-3 font-bold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {saving
-                    ? "Enviando e salvando..."
-                    : "Salvar na minha coleção"}
+                  {saving ? "Salvando carta..." : "Adicionar à coleção"}
                 </button>
               </div>
             </fieldset>
-
-            {message && (
-              <p
-                role="alert"
-                className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200"
-              >
-                {message}
-              </p>
-            )}
-
-            {saving && (
-              <p role="status" className="mt-4 text-sm text-zinc-400">
-                Aguarde nesta página até concluir o envio.
-              </p>
-            )}
           </form>
         )}
       </section>

@@ -27,6 +27,8 @@ async function CardContent({ params }: CardPageProps) {
     redirect("/auth/login");
   }
 
+  const userId = user.id;
+
   const { data: card, error } = await supabase
     .from("user_cards")
     .select(
@@ -40,29 +42,34 @@ async function CardContent({ params }: CardPageProps) {
       language,
       finish,
       notes,
-      front_image_path
+      front_image_path,
+      back_image_path
       `,
     )
     .eq("id", id)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (error || !card) {
     notFound();
   }
 
-  let imageUrl: string | null = null;
+  async function createPrivateImageUrl(imagePath: string | null) {
+    if (!imagePath || !imagePath.startsWith(`${userId}/`)) {
+      return null;
+    }
 
-  if (
-    card.front_image_path &&
-    card.front_image_path.startsWith(`${user.id}/`)
-  ) {
-    const { data: signedImage } = await supabase.storage
+    const { data } = await supabase.storage
       .from("card-scans")
-      .createSignedUrl(card.front_image_path, 3600);
+      .createSignedUrl(imagePath, 3600);
 
-    imageUrl = signedImage?.signedUrl ?? null;
+    return data?.signedUrl ?? null;
   }
+
+  const [frontImageUrl, backImageUrl] = await Promise.all([
+    createPrivateImageUrl(card.front_image_path),
+    createPrivateImageUrl(card.back_image_path),
+  ]);
 
   return (
     <main className="min-h-screen bg-[#09090f] text-white">
@@ -85,7 +92,7 @@ async function CardContent({ params }: CardPageProps) {
         </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-6 py-10">
+      <section className="mx-auto max-w-7xl px-6 py-10">
         <div className="mb-8">
           <p className="text-sm font-bold uppercase tracking-[0.25em] text-violet-400">
             Minha coleção
@@ -96,20 +103,57 @@ async function CardContent({ params }: CardPageProps) {
           </h1>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[380px_1fr]">
-          <section className="overflow-hidden rounded-3xl border border-white/10 bg-[#13131d]">
-            <div className="flex aspect-[2.5/3.5] items-center justify-center bg-gradient-to-br from-violet-950 to-zinc-950">
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt={`Foto da carta ${card.card_name || ""}`}
-                  className="h-full w-full object-contain"
-                />
-              ) : (
-                <p className="px-6 text-center text-zinc-500">
-                  Esta carta não possui foto.
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(340px,0.9fr)]">
+          <section>
+            <div className="grid gap-6 sm:grid-cols-2">
+              <article>
+                <p className="mb-3 text-sm font-bold uppercase tracking-wider text-zinc-400">
+                  Frente
                 </p>
-              )}
+
+                <div className="flex aspect-[2.5/3.5] items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-violet-950 to-zinc-950">
+                  {frontImageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={frontImageUrl}
+                      alt={`Frente da carta ${card.card_name || ""}`}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <p className="px-6 text-center text-zinc-500">
+                      Esta carta não possui foto da frente.
+                    </p>
+                  )}
+                </div>
+              </article>
+
+              <article>
+                <p className="mb-3 text-sm font-bold uppercase tracking-wider text-zinc-400">
+                  Verso
+                </p>
+
+                <div className="flex aspect-[2.5/3.5] items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-violet-950">
+                  {backImageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={backImageUrl}
+                      alt={`Verso da carta ${card.card_name || ""}`}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <div className="px-6 text-center">
+                      <p className="text-zinc-400">
+                        Foto do verso não cadastrada.
+                      </p>
+
+                      <p className="mt-2 text-sm text-zinc-600">
+                        As cartas cadastradas anteriormente continuam
+                        funcionando normalmente.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </article>
             </div>
           </section>
 
