@@ -28,6 +28,51 @@ type DeckBuilderProps = {
   initialDeckCards: DeckCard[];
 };
 
+function normalizeCardName(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLocaleLowerCase("pt-BR");
+}
+
+const basicEnergyNames = new Set([
+  "energia de planta",
+  "energia planta",
+  "grass energy",
+  "energia de fogo",
+  "energia fogo",
+  "fire energy",
+  "energia de agua",
+  "energia agua",
+  "water energy",
+  "energia eletrica",
+  "energia de raio",
+  "lightning energy",
+  "energia psiquica",
+  "psychic energy",
+  "energia de luta",
+  "energia luta",
+  "fighting energy",
+  "energia de escuridao",
+  "energia escuridao",
+  "darkness energy",
+  "energia de metal",
+  "energia metal",
+  "metal energy",
+  "energia de fada",
+  "energia fada",
+  "fairy energy",
+]);
+
+function isBasicEnergy(cardName: string | null) {
+  if (!cardName) {
+    return false;
+  }
+
+  return basicEnergyNames.has(normalizeCardName(cardName));
+}
+
 export function DeckBuilder({
   deckId,
   deckName,
@@ -77,6 +122,64 @@ export function DeckBuilder({
     [collectionCards, deckQuantities],
   );
 
+  const quantitiesByCardName = useMemo(() => {
+    const quantities: Record<string, number> = {};
+
+    collectionCards.forEach((card) => {
+      const quantity = deckQuantities[card.id] || 0;
+
+      if (quantity === 0) {
+        return;
+      }
+
+      const nameKey = normalizeCardName(card.card_name || card.id);
+
+      quantities[nameKey] = (quantities[nameKey] || 0) + quantity;
+    });
+
+    return quantities;
+  }, [collectionCards, deckQuantities]);
+
+  const copyViolations = useMemo(() => {
+    const violations: Array<{
+      name: string;
+      quantity: number;
+    }> = [];
+
+    const checkedNames = new Set<string>();
+
+    collectionCards.forEach((card) => {
+      const nameKey = normalizeCardName(card.card_name || card.id);
+
+      if (checkedNames.has(nameKey)) {
+        return;
+      }
+
+      checkedNames.add(nameKey);
+
+      const quantity = quantitiesByCardName[nameKey] || 0;
+
+      if (quantity > 4 && !isBasicEnergy(card.card_name)) {
+        violations.push({
+          name: card.card_name || "Carta sem nome",
+          quantity,
+        });
+      }
+    });
+
+    return violations;
+  }, [collectionCards, quantitiesByCardName]);
+
+  const deckIsValid = totalCards === 60 && copyViolations.length === 0;
+
+  const progress = Math.min(100, Math.round((totalCards / 60) * 100));
+  const remainingCards = Math.max(0, 60 - totalCards);
+
+  function getQuantityByCardName(card: CollectionCard) {
+    const nameKey = normalizeCardName(card.card_name || card.id);
+    return quantitiesByCardName[nameKey] || 0;
+  }
+
   async function updateCardQuantity(card: CollectionCard, newQuantity: number) {
     if (savingCardId) {
       return;
@@ -94,8 +197,20 @@ export function DeckBuilder({
 
     const newTotal = totalCards - currentQuantity + newQuantity;
 
-    if (newTotal > 60) {
-      setError("Um deck pode ter no máximo 60 cartas.");
+    if (newTotal > 60 && newQuantity > currentQuantity) {
+      setError("Um deck Pokémon deve ter exatamente 60 cartas.");
+      return;
+    }
+
+    const currentNameQuantity = getQuantityByCardName(card);
+    const newNameQuantity = currentNameQuantity - currentQuantity + newQuantity;
+
+    if (
+      !isBasicEnergy(card.card_name) &&
+      newNameQuantity > 4 &&
+      newQuantity > currentQuantity
+    ) {
+      setError(`O limite é de 4 cópias de ${card.card_name || "cada carta"}.`);
       return;
     }
 
@@ -203,13 +318,100 @@ export function DeckBuilder({
             </p>
           </div>
 
-          <div className="rounded-2xl border border-violet-500/30 bg-violet-500/10 px-6 py-4">
-            <p className="text-sm text-violet-200">Cartas no deck</p>
+          <div
+            className={`rounded-2xl border px-6 py-4 ${
+              deckIsValid
+                ? "border-green-500/30 bg-green-500/10"
+                : "border-violet-500/30 bg-violet-500/10"
+            }`}
+          >
+            <p
+              className={`text-sm ${
+                deckIsValid ? "text-green-200" : "text-violet-200"
+              }`}
+            >
+              Cartas no deck
+            </p>
+
             <p className="mt-1 text-3xl font-black">
               {totalCards}
               <span className="text-lg text-zinc-500">/60</span>
             </p>
           </div>
+        </div>
+
+        <div className="mt-8 rounded-2xl border border-white/10 bg-[#11111b] p-6">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+            <div>
+              <h2 className="text-lg font-black">Validação do deck</h2>
+
+              {deckIsValid ? (
+                <p className="mt-1 font-semibold text-green-300">
+                  ✓ Deck completo e válido para a Arena
+                </p>
+              ) : copyViolations.length > 0 ? (
+                <p className="mt-1 font-semibold text-red-300">
+                  O deck possui cartas acima do limite permitido.
+                </p>
+              ) : (
+                <p className="mt-1 text-zinc-400">
+                  Faltam {remainingCards} carta(s) para completar o deck.
+                </p>
+              )}
+            </div>
+
+            <span
+              className={`w-fit rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider ${
+                deckIsValid
+                  ? "bg-green-500/15 text-green-300"
+                  : "bg-amber-500/15 text-amber-300"
+              }`}
+            >
+              {deckIsValid ? "Pronto para jogar" : "Em construção"}
+            </span>
+          </div>
+
+          <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
+            <div
+              className={`h-full rounded-full transition-all ${
+                deckIsValid ? "bg-green-500" : "bg-violet-500"
+              }`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          <div className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+            <p
+              className={totalCards === 60 ? "text-green-300" : "text-zinc-400"}
+            >
+              {totalCards === 60 ? "✓" : "○"} Total de 60 cartas
+            </p>
+
+            <p
+              className={
+                copyViolations.length === 0 ? "text-green-300" : "text-red-300"
+              }
+            >
+              {copyViolations.length === 0 ? "✓" : "✕"} Limite de 4 cópias por
+              carta
+            </p>
+          </div>
+
+          {copyViolations.length > 0 && (
+            <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+              {copyViolations.map((violation) => (
+                <p key={violation.name} className="text-sm text-red-200">
+                  {violation.name}: {violation.quantity} cópias. Remova{" "}
+                  {violation.quantity - 4}.
+                </p>
+              ))}
+            </div>
+          )}
+
+          <p className="mt-4 text-xs text-zinc-500">
+            Energias Básicas não possuem o limite de quatro cópias. A
+            verificação depende do nome informado no cadastro da carta.
+          </p>
         </div>
 
         {message && (
@@ -247,6 +449,7 @@ export function DeckBuilder({
                 {cardsInDeck.map((card) => {
                   const quantity = deckQuantities[card.id] || 0;
                   const saving = savingCardId === card.id;
+                  const basicEnergy = isBasicEnergy(card.card_name);
 
                   return (
                     <div
@@ -263,6 +466,12 @@ export function DeckBuilder({
                             {card.set_name || "Coleção não informada"}
                             {card.card_number ? ` • ${card.card_number}` : ""}
                           </p>
+
+                          {basicEnergy && (
+                            <span className="mt-2 inline-block rounded-full bg-blue-500/10 px-2 py-1 text-[10px] font-bold uppercase text-blue-300">
+                              Energia básica
+                            </span>
+                          )}
                         </div>
 
                         <span className="rounded-lg bg-violet-500/15 px-3 py-1 text-sm font-bold text-violet-300">
@@ -291,7 +500,8 @@ export function DeckBuilder({
                             saving ||
                             Boolean(savingCardId) ||
                             quantity >= card.quantity ||
-                            totalCards >= 60
+                            totalCards >= 60 ||
+                            (!basicEnergy && getQuantityByCardName(card) >= 4)
                           }
                           onClick={() => updateCardQuantity(card, quantity + 1)}
                           className="h-9 w-9 rounded-lg border border-white/15 font-bold hover:bg-white/10 disabled:opacity-50"
@@ -358,6 +568,9 @@ export function DeckBuilder({
               <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {filteredCards.map((card) => {
                   const quantityInDeck = deckQuantities[card.id] || 0;
+                  const quantityByName = getQuantityByCardName(card);
+                  const basicEnergy = isBasicEnergy(card.card_name);
+                  const copyLimitReached = !basicEnergy && quantityByName >= 4;
                   const saving = savingCardId === card.id;
 
                   return (
@@ -381,9 +594,17 @@ export function DeckBuilder({
                       </div>
 
                       <div className="p-5">
-                        <h3 className="font-bold">
-                          {card.card_name || "Carta sem nome"}
-                        </h3>
+                        <div className="flex items-start justify-between gap-3">
+                          <h3 className="font-bold">
+                            {card.card_name || "Carta sem nome"}
+                          </h3>
+
+                          {basicEnergy && (
+                            <span className="rounded-full bg-blue-500/10 px-2 py-1 text-[9px] font-bold uppercase text-blue-300">
+                              Básica
+                            </span>
+                          )}
+                        </div>
 
                         <p className="mt-1 text-sm text-zinc-400">
                           {card.set_name || "Coleção não informada"}
@@ -396,13 +617,20 @@ export function DeckBuilder({
                           <span>{card.quantity} disponível(is)</span>
                         </div>
 
+                        {!basicEnergy && quantityInDeck > 0 && (
+                          <p className="mt-3 text-xs text-violet-300">
+                            {quantityByName}/4 cópias no deck
+                          </p>
+                        )}
+
                         <button
                           type="button"
                           disabled={
                             saving ||
                             Boolean(savingCardId) ||
                             quantityInDeck >= card.quantity ||
-                            totalCards >= 60
+                            totalCards >= 60 ||
+                            copyLimitReached
                           }
                           onClick={() =>
                             updateCardQuantity(card, quantityInDeck + 1)
@@ -411,9 +639,11 @@ export function DeckBuilder({
                         >
                           {saving
                             ? "Salvando..."
-                            : quantityInDeck > 0
-                              ? `Adicionar mais (${quantityInDeck} no deck)`
-                              : "Adicionar ao deck"}
+                            : copyLimitReached
+                              ? "Limite de 4 atingido"
+                              : quantityInDeck > 0
+                                ? `Adicionar mais (${quantityInDeck} no deck)`
+                                : "Adicionar ao deck"}
                         </button>
                       </div>
                     </article>
