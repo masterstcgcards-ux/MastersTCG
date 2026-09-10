@@ -464,7 +464,7 @@ export function TournamentsManager({
         </h2>
 
         <p className="mt-2 text-sm text-zinc-400">
-          "Confira os torneios publicados e envie seu deck para revisão.""
+          Confira os torneios publicados e envie seu deck para revisão.
         </p>
 
         {tournaments.length === 0 ? (
@@ -484,12 +484,6 @@ export function TournamentsManager({
                   className="min-w-0 rounded-2xl border border-white/10 bg-[#13131d] p-6"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <Link
-                      href={`/arena/${tournament.id}/registrations`}
-                      className="rounded-xl border border-violet-500/30 px-5 py-3 text-sm font-bold text-violet-300 hover:bg-violet-500/10"
-                    >
-                      Ver inscrições
-                    </Link>
                     <p className="text-xs font-bold uppercase tracking-widest text-violet-400">
                       Pokémon TCG
                     </p>
@@ -566,6 +560,25 @@ export function TournamentsManager({
                         {tournament.rules}
                       </p>
                     </details>
+                  )}
+                  {tournament.status !== "draft" && (
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      <Link
+                        href={`/arena/${tournament.id}/bracket`}
+                        className="rounded-xl bg-violet-600 px-5 py-3 text-sm font-bold text-white hover:bg-violet-500"
+                      >
+                        Ver chave
+                      </Link>
+
+                      {isAdmin && (
+                        <Link
+                          href={`/arena/${tournament.id}/registrations`}
+                          className="rounded-xl border border-violet-500/30 px-5 py-3 text-sm font-bold text-violet-300 hover:bg-violet-500/10"
+                        >
+                          Ver inscrições
+                        </Link>
+                      )}
+                    </div>
                   )}
 
                   {isAdmin && (
