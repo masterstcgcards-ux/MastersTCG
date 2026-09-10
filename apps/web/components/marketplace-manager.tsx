@@ -399,8 +399,8 @@ export function MarketplaceManager({
             <h2 className="mt-2 text-2xl font-black">Anuncie uma carta</h2>
 
             <p className="mt-2 max-w-2xl text-sm text-zinc-300">
-              Escolha uma carta da sua coleção e publique para venda ou troca.
-              Os leilões serão ativados em uma próxima etapa.
+              Escolha uma carta da sua coleção e publique para venda, troca ou
+              leilão.
             </p>
           </div>
 

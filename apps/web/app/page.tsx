@@ -204,8 +204,8 @@ export default function Home() {
       >
         <div className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-2">
           <div>
-            <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-300">
-              Em breve
+            <span className="rounded-full border border-violet-400/25 bg-violet-400/10 px-3 py-1 text-xs font-semibold text-violet-300">
+              Disponível agora
             </span>
 
             <p className="mt-6 text-sm font-semibold uppercase tracking-[0.25em] text-violet-400">
@@ -218,14 +218,17 @@ export default function Home() {
             </h2>
 
             <p className="mt-5 max-w-xl leading-relaxed text-zinc-400">
-              A Arena será o espaço dos torneios MastersTCG: competições com
-              regulamento, acompanhamento de partidas e prêmios definidos em
-              cada evento.
+              A Arena é o espaço dos torneios MastersTCG: competições com
+              regulamento, inscrições, acompanhamento de partidas e prêmios
+              definidos em cada evento.
             </p>
 
-            <p className="mt-4 text-sm text-zinc-500">
-              Os torneios ainda não estão disponíveis para inscrição.
-            </p>
+            <Link
+              href="/arena"
+              className="mt-6 inline-flex rounded-xl bg-violet-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-violet-500"
+            >
+              Explorar a Arena
+            </Link>
           </div>
 
           <div className="flex flex-col justify-center gap-4">

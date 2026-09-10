@@ -188,9 +188,9 @@ async function MarketplaceContent() {
         </p>
 
         <div className="mt-6 rounded-xl border border-yellow-500/20 bg-yellow-500/10 p-4 text-sm text-yellow-100">
-          Nesta etapa, o MastersTCG funciona como uma vitrine. Pagamentos,
-          entregas e trocas devem ser combinados com cuidado entre os usuários.
-          O sistema de propostas será criado no módulo 18.
+          Pagamentos, entregas e trocas são combinados diretamente entre os
+          usuários. Confira as cartas e os dados da negociação antes de
+          concluir.
         </div>
 
         {loadingError && (

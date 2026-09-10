@@ -95,7 +95,9 @@ async function ProfileContent() {
 
             <span className="font-semibold text-white">Meu perfil</span>
 
-            <span>Arena · Em breve</span>
+            <Link href="/arena" className="hover:text-white">
+              Arena
+            </Link>
           </nav>
 
           <LogoutButton />

@@ -262,23 +262,14 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
                 className={fieldClass}
               />
             </div>
+            <div className="rounded-xl border border-white/10 bg-white/[0.025] p-4 md:col-span-2">
+              <span className="block font-semibold">Deck privado</span>
 
-            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/[0.025] p-4 md:col-span-2">
-              <input
-                type="checkbox"
-                name="is_public"
-                className="h-5 w-5 accent-violet-600"
-              />
-
-              <span>
-                <span className="block font-semibold">Deck público</span>
-
-                <span className="text-sm text-zinc-500">
-                  A publicação para outros usuários será ativada em uma próxima
-                  etapa.
-                </span>
+              <span className="text-sm text-zinc-500">
+                Seu deck e as cartas adicionadas ficam visíveis apenas para
+                você.
               </span>
-            </label>
+            </div>
 
             <button
               type="submit"
