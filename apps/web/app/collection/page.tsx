@@ -80,20 +80,29 @@ async function CollectionContent() {
           >
             MASTERS<span className="text-violet-400">TCG</span>
           </Link>
-
-          <nav className="hidden items-center gap-6 text-sm text-zinc-400 md:flex">
+          <nav className="hidden items-center gap-5 text-sm text-zinc-400 md:flex">
             <span className="font-semibold text-white">Minha coleção</span>
+
+            <Link href="/decks" className="hover:text-white">
+              Meus decks
+            </Link>
+
+            <Link href="/marketplace" className="hover:text-white">
+              Marketplace
+            </Link>
+
+            <Link href="/arena" className="hover:text-white">
+              Arena
+            </Link>
+
+            <Link href="/ranking" className="hover:text-white">
+              Ranking
+            </Link>
+
             <Link href="/profile" className="hover:text-white">
               Meu perfil
             </Link>
-            <span>Marketplace · Em breve</span>
-            <span>Arena · Em breve</span>
-
-            <span className="rounded-full bg-violet-500/10 px-3 py-1 text-xs text-violet-300">
-              Pokémon
-            </span>
           </nav>
-
           <LogoutButton />
         </div>
       </header>

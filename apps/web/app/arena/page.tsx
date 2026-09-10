@@ -119,6 +119,9 @@ async function ArenaContent() {
             <Link href="/ranking" className="hover:text-white">
               Ranking
             </Link>
+            <Link href="/marketplace" className="hover:text-white">
+              Marketplace
+            </Link>
 
             {user && !authError ? (
               <Link href="/profile" className="hover:text-white">

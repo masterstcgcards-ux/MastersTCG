@@ -68,7 +68,6 @@ async function DecksContent() {
           >
             MASTERS<span className="text-violet-400">TCG</span>
           </Link>
-
           <nav
             aria-label="Navegação principal"
             className="flex flex-wrap items-center gap-5 text-sm text-zinc-400"
@@ -81,13 +80,22 @@ async function DecksContent() {
               Meus decks
             </Link>
 
+            <Link href="/marketplace" className="hover:text-white">
+              Marketplace
+            </Link>
+
+            <Link href="/arena" className="hover:text-white">
+              Arena
+            </Link>
+
+            <Link href="/ranking" className="hover:text-white">
+              Ranking
+            </Link>
+
             <Link href="/profile" className="hover:text-white">
               Meu perfil
             </Link>
-
-            <span className="text-zinc-600">Arena · Em breve</span>
           </nav>
-
           <LogoutButton />
         </div>
       </header>
