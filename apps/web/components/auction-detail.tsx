@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import type { MarketplaceAuction } from "@/components/auctions-manager";
+import { ReportForm } from "@/components/report-form";
 import { createClient } from "@/lib/supabase/client";
 
 export type AuctionBid = {
@@ -458,6 +459,13 @@ export function AuctionDetail({
                   {cancelling ? "Cancelando..." : "Cancelar leilão"}
                 </button>
               )}
+            {!auction.is_own && (
+              <ReportForm
+                targetType="auction"
+                targetId={auction.auction_id}
+                targetLabel="leilão"
+              />
+            )}
           </section>
 
           <section className="rounded-2xl border border-white/10 bg-[#13131d] p-6">

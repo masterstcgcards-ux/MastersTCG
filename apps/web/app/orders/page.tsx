@@ -24,7 +24,7 @@ type OrdersPageProps = {
 
 type RawOrder = Omit<
   MarketplaceOrder,
-  "front_image_url" | "unit_price" | "total_amount"
+  "front_image_url" | "unit_price" | "total_amount" | "has_reviewed"
 > & {
   unit_price: number | string;
   total_amount: number | string;
@@ -48,16 +48,17 @@ async function createSignedImageUrl(
 
   return data.signedUrl;
 }
-
 async function addSignedImages(
   supabase: Awaited<ReturnType<typeof createClient>>,
   orders: RawOrder[],
+  reviewedOrderIds: Set<string>,
 ) {
   return Promise.all(
     orders.map(async (order) => ({
       ...order,
       unit_price: Number(order.unit_price),
       total_amount: Number(order.total_amount),
+      has_reviewed: reviewedOrderIds.has(order.order_id),
       front_image_url: await createSignedImageUrl(
         supabase,
         order.front_image_path,
@@ -92,8 +93,17 @@ async function OrdersContent({ searchParams }: OrdersPageProps) {
       p_scope: "sales",
     },
   );
+  const { data: reviewedOrdersData, error: reviewedOrdersError } =
+    await supabase
+      .from("marketplace_reviews")
+      .select("order_id")
+      .eq("reviewer_id", user.id);
 
-  const loadingError = purchasesError || salesError;
+  const reviewedOrderIds = new Set(
+    (reviewedOrdersData || []).map((review) => review.order_id),
+  );
+
+  const loadingError = purchasesError || salesError || reviewedOrdersError;
 
   if (loadingError) {
     return (
@@ -117,11 +127,13 @@ async function OrdersContent({ searchParams }: OrdersPageProps) {
   const purchases = await addSignedImages(
     supabase,
     (purchasesData || []) as RawOrder[],
+    reviewedOrderIds,
   );
 
   const sales = await addSignedImages(
     supabase,
     (salesData || []) as RawOrder[],
+    reviewedOrderIds,
   );
 
   const initialTab = query.tab === "sales" ? "sales" : "purchases";

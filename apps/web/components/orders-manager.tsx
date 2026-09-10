@@ -2,7 +2,8 @@
 
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
-
+import { ReportForm } from "@/components/report-form";
+import { ReviewForm } from "@/components/review-form";
 import { createClient } from "@/lib/supabase/client";
 
 export type MarketplaceOrder = {
@@ -35,6 +36,7 @@ export type MarketplaceOrder = {
   seller_display_name: string | null;
   seller_username: string | null;
   created_at: string;
+  has_reviewed: boolean;
   updated_at: string;
 };
 
@@ -413,7 +415,26 @@ export function OrdersManager({
                         </p>
                       </div>
                     )}
+                    {order.order_status === "completed" &&
+                      !order.has_reviewed && (
+                        <ReviewForm
+                          orderId={order.order_id}
+                          reviewedName={counterpartName}
+                        />
+                      )}
 
+                    {order.order_status === "completed" &&
+                      order.has_reviewed && (
+                        <div className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm text-emerald-200">
+                          Você já avaliou esta negociação.
+                        </div>
+                      )}
+
+                    <ReportForm
+                      targetType="order"
+                      targetId={order.order_id}
+                      targetLabel="negociação"
+                    />
                     <p className="mt-5 text-xs text-zinc-600">
                       Pedido criado em {formatDate(order.created_at)}
                     </p>

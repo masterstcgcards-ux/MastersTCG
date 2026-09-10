@@ -122,6 +122,11 @@ async function ArenaContent() {
             <Link href="/marketplace" className="hover:text-white">
               Marketplace
             </Link>
+            {isAdmin && (
+              <Link href="/moderation" className="hover:text-white">
+                Moderação
+              </Link>
+            )}
 
             {user && !authError ? (
               <Link href="/profile" className="hover:text-white">

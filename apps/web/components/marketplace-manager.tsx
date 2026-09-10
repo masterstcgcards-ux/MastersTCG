@@ -4,6 +4,7 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
+import { ReportForm } from "@/components/report-form";
 
 export type MarketplaceCard = {
   id: string;
@@ -875,6 +876,23 @@ export function MarketplaceManager({
                     <p className="mt-4 text-xs text-zinc-600">
                       Publicado em {formatDate(listing.created_at)}
                     </p>
+                    {!listing.is_own && (
+                      <>
+                        <Link
+                          href={`/reputation/${listing.seller_id}`}
+                          className="mt-4 inline-flex text-sm font-bold text-yellow-300 hover:text-yellow-200"
+                        >
+                          ★ Ver reputação do vendedor
+                        </Link>
+
+                        <ReportForm
+                          targetType="listing"
+                          targetId={listing.listing_id}
+                          targetLabel="anúncio"
+                        />
+                      </>
+                    )}
+
                     {currentTab === "marketplace" &&
                       listing.listing_type === "sale" &&
                       !listing.is_own && (
