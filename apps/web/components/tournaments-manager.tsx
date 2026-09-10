@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { useRef, useState } from "react";
 import type { FormEvent } from "react";
@@ -483,6 +484,12 @@ export function TournamentsManager({
                   className="min-w-0 rounded-2xl border border-white/10 bg-[#13131d] p-6"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
+                    <Link
+                      href={`/arena/${tournament.id}/registrations`}
+                      className="rounded-xl border border-violet-500/30 px-5 py-3 text-sm font-bold text-violet-300 hover:bg-violet-500/10"
+                    >
+                      Ver inscrições
+                    </Link>
                     <p className="text-xs font-bold uppercase tracking-widest text-violet-400">
                       Pokémon TCG
                     </p>
