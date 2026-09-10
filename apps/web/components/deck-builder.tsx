@@ -347,7 +347,7 @@ export function DeckBuilder({
 
               {deckIsValid ? (
                 <p className="mt-1 font-semibold text-green-300">
-                  ✓ Deck completo e válido para a Arena
+                  ✓ ✓ Deck completo para enviar à revisão
                 </p>
               ) : copyViolations.length > 0 ? (
                 <p className="mt-1 font-semibold text-red-300">

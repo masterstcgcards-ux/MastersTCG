@@ -103,8 +103,8 @@ async function DecksContent() {
           </h1>
 
           <p className="mt-3 max-w-2xl text-zinc-400">
-            Crie e organize seus decks de Pokémon TCG. No próximo passo,
-            adicionaremos as cartas da sua coleção aos decks.
+            Crie seus decks de Pokémon TCG, adicione cartas da sua coleção e
+            prepare-se para os torneios da Arena.
           </p>
         </div>
 

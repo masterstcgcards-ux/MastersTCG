@@ -393,7 +393,7 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
               </div>
 
               <p className="mt-3 text-xs text-zinc-600">
-                A seleção de cartas será ativada na próxima etapa.
+                Abra o deck para adicionar, remover e organizar suas cartas.
               </p>
             </article>
           ))}

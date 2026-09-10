@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/client";
 
+import { TournamentRegistration } from "@/components/tournament-registration";
+
 export type Tournament = {
   id: string;
   name: string;
@@ -275,7 +277,7 @@ export function TournamentsManager({
 
       setMessage(
         nextStatus === "published"
-          ? "Torneio publicado. As inscrições ainda não estão disponíveis nesta versão."
+          ? "Torneio publicado com sucesso."
           : "Torneio cancelado. O histórico foi mantido.",
       );
 
@@ -461,7 +463,7 @@ export function TournamentsManager({
         </h2>
 
         <p className="mt-2 text-sm text-zinc-400">
-          As inscrições serão disponibilizadas em uma próxima etapa.
+          "Confira os torneios publicados e envie seu deck para revisão.""
         </p>
 
         {tournaments.length === 0 ? (
@@ -588,10 +590,10 @@ export function TournamentsManager({
                   )}
 
                   {tournament.status === "published" && (
-                    <p className="mt-5 text-xs text-zinc-500">
-                      Torneio publicado. Inscrições ainda não disponíveis nesta
-                      versão.
-                    </p>
+                    <TournamentRegistration
+                      tournamentId={tournament.id}
+                      tournamentFormat={tournament.format}
+                    />
                   )}
                 </article>
               );
