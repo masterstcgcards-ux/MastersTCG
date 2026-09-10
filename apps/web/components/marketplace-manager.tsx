@@ -876,6 +876,17 @@ export function MarketplaceManager({
                       Publicado em {formatDate(listing.created_at)}
                     </p>
                     {currentTab === "marketplace" &&
+                      listing.listing_type === "sale" &&
+                      !listing.is_own && (
+                        <Link
+                          href={`/marketplace/${listing.listing_id}/buy`}
+                          className="mt-5 block w-full rounded-xl bg-emerald-600 px-5 py-3 text-center text-sm font-bold text-white hover:bg-emerald-500"
+                        >
+                          Comprar
+                        </Link>
+                      )}
+
+                    {currentTab === "marketplace" &&
                       listing.listing_type === "trade" &&
                       !listing.is_own && (
                         <Link
