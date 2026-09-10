@@ -158,6 +158,10 @@ async function MarketplaceContent() {
               Marketplace
             </Link>
 
+            <Link href="/offers" className="transition hover:text-white">
+              Propostas
+            </Link>
+
             <Link href="/profile" className="transition hover:text-white">
               Perfil
             </Link>

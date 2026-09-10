@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
@@ -874,7 +875,16 @@ export function MarketplaceManager({
                     <p className="mt-4 text-xs text-zinc-600">
                       Publicado em {formatDate(listing.created_at)}
                     </p>
-
+                    {currentTab === "marketplace" &&
+                      listing.listing_type === "trade" &&
+                      !listing.is_own && (
+                        <Link
+                          href={`/marketplace/${listing.listing_id}/offer`}
+                          className="mt-5 block w-full rounded-xl bg-violet-600 px-5 py-3 text-center text-sm font-bold text-white hover:bg-violet-500"
+                        >
+                          Fazer proposta
+                        </Link>
+                      )}
                     {currentTab === "mine" && (
                       <div className="mt-5 flex flex-wrap gap-2">
                         {listing.listing_status === "active" && (
