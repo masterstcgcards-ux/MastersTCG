@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 
 import type { MarketplaceAuction } from "@/components/auctions-manager";
 import { ReportForm } from "@/components/report-form";
@@ -240,11 +240,17 @@ export function AuctionDetail({
   return (
     <div>
       {message && (
-        <div className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-200">
+        <div
+          role="status"
+          className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-700"
+        >
           {message}
 
           {auction.auction_status === "ended" && auction.is_highest_bidder && (
-            <Link href="/orders" className="ml-2 font-bold underline">
+            <Link
+              href="/orders"
+              className="ml-2 font-black text-emerald-800 underline"
+            >
               Ver pedido
             </Link>
           )}
@@ -254,41 +260,42 @@ export function AuctionDetail({
       {error && (
         <div
           role="alert"
-          className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200"
+          className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 font-semibold text-red-700"
         >
           {error}
         </div>
       )}
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
-        <article className="overflow-hidden rounded-2xl border border-white/10 bg-[#13131d]">
-          <div className="aspect-[4/3] bg-black/30">
+        <article className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm">
+          <div className="flex items-center justify-center border-b border-blue-100 bg-gradient-to-br from-blue-50 to-slate-50 p-6 sm:p-10">
             {auction.front_image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={auction.front_image_url}
                 alt={auction.card_name}
-                className="h-full w-full object-contain p-6"
+                className="aspect-[2.5/3.5] max-h-[560px] w-auto max-w-full rounded-2xl object-contain drop-shadow-xl"
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-zinc-600">
+              <div className="flex aspect-[2.5/3.5] h-[420px] max-w-full items-center justify-center rounded-2xl border border-dashed border-blue-200 bg-white px-6 text-center text-slate-400">
                 Imagem não disponível
               </div>
             )}
           </div>
 
-          <div className="p-6 sm:p-8">
+          <div className="p-5 sm:p-8">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="rounded-full bg-violet-500/15 px-3 py-1 text-xs font-bold text-violet-200">
+              <span className="rounded-full bg-amber-100 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-amber-800">
                 Leilão
               </span>
 
               <span
-                className={`rounded-full px-3 py-1 text-xs font-bold ${
+                className={`rounded-full border px-3 py-1.5 text-xs font-bold ${
                   auction.auction_status === "active"
-                    ? "bg-emerald-500/15 text-emerald-200"
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                     : auction.auction_status === "cancelled"
-                      ? "bg-red-500/15 text-red-200"
-                      : "bg-violet-500/15 text-violet-200"
+                      ? "border-red-200 bg-red-50 text-red-700"
+                      : "border-blue-200 bg-blue-50 text-blue-700"
                 }`}
               >
                 {auction.auction_status === "active"
@@ -299,45 +306,57 @@ export function AuctionDetail({
               </span>
             </div>
 
-            <h1 className="mt-5 break-words text-3xl font-black sm:text-4xl">
+            <h1 className="mt-5 break-words text-3xl font-black text-[#071a4c] sm:text-4xl">
               {auction.title}
             </h1>
 
-            <p className="mt-4 text-xl font-bold">{auction.card_name}</p>
+            <p className="mt-4 text-xl font-bold text-slate-800">
+              {auction.card_name}
+            </p>
 
-            <p className="mt-1 text-zinc-500">
+            <p className="mt-1 text-slate-500">
               {auction.set_name || "Coleção não informada"}
               {auction.card_number ? ` · ${auction.card_number}` : ""}
             </p>
 
             {auction.description && (
-              <p className="mt-6 whitespace-pre-wrap break-words leading-7 text-zinc-300">
+              <p className="mt-6 whitespace-pre-wrap break-words leading-7 text-slate-600">
                 {auction.description}
               </p>
             )}
 
-            <dl className="mt-8 grid gap-5 border-t border-white/10 pt-6 text-sm sm:grid-cols-2">
-              <div>
-                <dt className="text-zinc-500">Vendedor</dt>
-                <dd className="mt-1 font-semibold">{sellerName}</dd>
+            <dl className="mt-8 grid grid-cols-2 gap-3 border-t border-blue-100 pt-6 text-sm">
+              <div className="rounded-xl bg-slate-50 p-4">
+                <dt className="text-xs font-semibold text-slate-500">
+                  Vendedor
+                </dt>
+                <dd className="mt-1 break-words font-bold text-[#071a4c]">
+                  {sellerName}
+                </dd>
               </div>
 
-              <div>
-                <dt className="text-zinc-500">Quantidade</dt>
-                <dd className="mt-1 font-semibold">{auction.quantity}</dd>
+              <div className="rounded-xl bg-slate-50 p-4">
+                <dt className="text-xs font-semibold text-slate-500">
+                  Quantidade
+                </dt>
+                <dd className="mt-1 font-bold text-[#071a4c]">
+                  {auction.quantity}
+                </dd>
               </div>
 
-              <div>
-                <dt className="text-zinc-500">Localização</dt>
-                <dd className="mt-1 font-semibold">
+              <div className="rounded-xl bg-slate-50 p-4">
+                <dt className="text-xs font-semibold text-slate-500">
+                  Localização
+                </dt>
+                <dd className="mt-1 break-words font-bold text-[#071a4c]">
                   {[auction.city, auction.state].filter(Boolean).join(" - ") ||
                     "Não informada"}
                 </dd>
               </div>
 
-              <div>
-                <dt className="text-zinc-500">Envio</dt>
-                <dd className="mt-1 font-semibold">
+              <div className="rounded-xl bg-slate-50 p-4">
+                <dt className="text-xs font-semibold text-slate-500">Envio</dt>
+                <dd className="mt-1 font-bold text-[#071a4c]">
                   {auction.shipping_available ? "Disponível" : "A combinar"}
                 </dd>
               </div>
@@ -346,144 +365,178 @@ export function AuctionDetail({
         </article>
 
         <aside className="space-y-6">
-          <section className="rounded-2xl border border-violet-500/20 bg-[#13131d] p-6">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-400">
-              {auction.bid_count > 0 ? "Maior lance" : "Lance inicial"}
-            </p>
+          <section className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm">
+            <div className="relative overflow-hidden bg-gradient-to-br from-[#071a4c] via-blue-800 to-blue-600 p-6 text-white">
+              <div
+                aria-hidden="true"
+                className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-yellow-400/20 blur-3xl"
+              />
 
-            <p className="mt-2 text-4xl font-black">
-              {formatCurrency(auction.current_price)}
-            </p>
+              <div className="relative">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-yellow-300">
+                  {auction.bid_count > 0 ? "Maior lance" : "Lance inicial"}
+                </p>
 
-            <p className="mt-2 text-sm text-zinc-400">
-              {auction.bid_count} {auction.bid_count === 1 ? "lance" : "lances"}{" "}
-              registrados
-            </p>
+                <p className="mt-2 break-words text-4xl font-black">
+                  {formatCurrency(auction.current_price)}
+                </p>
 
-            <div className="mt-6 rounded-xl bg-black/30 p-4 text-center">
-              <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">
-                Tempo restante
-              </p>
-
-              <p
-                className={`mt-2 text-2xl font-black ${
-                  remainingTime.expired ? "text-red-300" : "text-yellow-200"
-                }`}
-              >
-                {auction.auction_status !== "active"
-                  ? "Encerrado"
-                  : remainingTime.expired
-                    ? "Prazo encerrado"
-                    : remainingTime.label}
-              </p>
-
-              <p className="mt-2 text-xs text-zinc-500">
-                {formatDate(auction.ends_at)}
-              </p>
+                <p className="mt-2 text-sm text-blue-100">
+                  {auction.bid_count}{" "}
+                  {auction.bid_count === 1 ? "lance" : "lances"} registrados
+                </p>
+              </div>
             </div>
 
-            {auction.is_highest_bidder &&
-              auction.auction_status === "active" && (
-                <div className="mt-5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm font-bold text-emerald-200">
-                  Você possui o maior lance.
-                </div>
-              )}
+            <div className="p-5 sm:p-6">
+              <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-center">
+                <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
+                  Tempo restante
+                </p>
 
-            {!auction.is_own &&
-              auction.auction_status === "active" &&
-              !remainingTime.expired && (
-                <form onSubmit={handleBid} className="mt-6">
-                  <label
-                    htmlFor="bid-amount"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Seu lance
-                  </label>
+                <p
+                  className={`mt-2 text-2xl font-black ${
+                    remainingTime.expired || auction.auction_status !== "active"
+                      ? "text-red-600"
+                      : "text-amber-600"
+                  }`}
+                >
+                  {auction.auction_status !== "active"
+                    ? "Encerrado"
+                    : remainingTime.expired
+                      ? "Prazo encerrado"
+                      : remainingTime.label}
+                </p>
 
-                  <input
-                    id="bid-amount"
-                    type="number"
-                    min={minimumBid}
-                    step="0.01"
-                    value={bidAmount}
-                    onChange={(event) =>
-                      setBidAmount(Number(event.target.value))
-                    }
-                    required
-                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-lg font-bold outline-none focus:border-violet-500"
-                  />
+                <p className="mt-2 text-xs text-slate-500">
+                  {formatDate(auction.ends_at)}
+                </p>
+              </div>
 
-                  <p className="mt-2 text-xs text-zinc-500">
-                    Lance mínimo: {formatCurrency(minimumBid)}
-                  </p>
+              {auction.is_highest_bidder &&
+                auction.auction_status === "active" && (
+                  <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-emerald-700">
+                    Você possui o maior lance.
+                  </div>
+                )}
 
-                  <button
-                    type="submit"
-                    disabled={
-                      submitting ||
-                      auction.is_highest_bidder ||
-                      bidAmount < minimumBid
-                    }
-                    className="mt-5 w-full rounded-xl bg-violet-600 px-5 py-4 text-sm font-black text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {submitting
-                      ? "Registrando..."
-                      : auction.is_highest_bidder
-                        ? "Você está vencendo"
-                        : "Dar lance"}
-                  </button>
-                </form>
-              )}
+              {!auction.is_own &&
+                auction.auction_status === "active" &&
+                !remainingTime.expired && (
+                  <form onSubmit={handleBid} className="mt-6">
+                    <label
+                      htmlFor="bid-amount"
+                      className="mb-2 block text-sm font-bold text-[#071a4c]"
+                    >
+                      Seu lance
+                    </label>
 
-            {auction.auction_status === "active" && remainingTime.expired && (
-              <button
-                type="button"
-                disabled={finalizing}
-                onClick={handleFinalize}
-                className="mt-6 w-full rounded-xl bg-violet-600 px-5 py-4 text-sm font-black text-white hover:bg-violet-500 disabled:opacity-50"
-              >
-                {finalizing ? "Encerrando..." : "Encerrar e definir vencedor"}
-              </button>
-            )}
+                    <input
+                      id="bid-amount"
+                      type="number"
+                      min={minimumBid}
+                      step="0.01"
+                      value={bidAmount}
+                      onChange={(event) =>
+                        setBidAmount(Number(event.target.value))
+                      }
+                      required
+                      className="w-full rounded-xl border border-blue-100 bg-white px-4 py-3 text-lg font-bold text-[#071a4c] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    />
 
-            {auction.is_own &&
-              auction.auction_status === "active" &&
-              auction.bid_count === 0 &&
-              !remainingTime.expired && (
+                    <p className="mt-2 text-xs text-slate-500">
+                      Lance mínimo: {formatCurrency(minimumBid)}
+                    </p>
+
+                    <button
+                      type="submit"
+                      disabled={
+                        submitting ||
+                        auction.is_highest_bidder ||
+                        bidAmount < minimumBid
+                      }
+                      className="mt-5 w-full rounded-xl bg-blue-600 px-5 py-4 text-sm font-black text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {submitting
+                        ? "Registrando..."
+                        : auction.is_highest_bidder
+                          ? "Você está vencendo"
+                          : "Dar lance"}
+                    </button>
+                  </form>
+                )}
+
+              {auction.auction_status === "active" && remainingTime.expired && (
                 <button
                   type="button"
-                  disabled={cancelling}
-                  onClick={handleCancel}
-                  className="mt-5 w-full rounded-xl border border-red-500/30 px-5 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                  disabled={finalizing}
+                  onClick={handleFinalize}
+                  className="mt-6 w-full rounded-xl bg-blue-600 px-5 py-4 text-sm font-black text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {cancelling ? "Cancelando..." : "Cancelar leilão"}
+                  {finalizing ? "Encerrando..." : "Encerrar e definir vencedor"}
                 </button>
               )}
-            {!auction.is_own && (
-              <ReportForm
-                targetType="auction"
-                targetId={auction.auction_id}
-                targetLabel="leilão"
-              />
-            )}
+
+              {auction.is_own &&
+                auction.auction_status === "active" &&
+                auction.bid_count === 0 &&
+                !remainingTime.expired && (
+                  <button
+                    type="button"
+                    disabled={cancelling}
+                    onClick={handleCancel}
+                    className="mt-5 w-full rounded-xl border border-red-200 bg-white px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {cancelling ? "Cancelando..." : "Cancelar leilão"}
+                  </button>
+                )}
+
+              {!auction.is_own && (
+                <ReportForm
+                  targetType="auction"
+                  targetId={auction.auction_id}
+                  targetLabel="leilão"
+                />
+              )}
+            </div>
           </section>
 
-          <section className="rounded-2xl border border-white/10 bg-[#13131d] p-6">
-            <h2 className="text-xl font-black">Histórico de lances</h2>
+          <section className="rounded-3xl border border-blue-100 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">
+                  Movimentação
+                </p>
+
+                <h2 className="mt-1 text-xl font-black text-[#071a4c]">
+                  Histórico de lances
+                </h2>
+              </div>
+
+              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
+                {bids.length}
+              </span>
+            </div>
 
             {bids.length === 0 ? (
-              <p className="mt-5 text-sm text-zinc-500">
-                Este leilão ainda não recebeu lances.
-              </p>
+              <div className="mt-5 rounded-2xl border border-dashed border-blue-200 bg-blue-50/40 p-6 text-center">
+                <p className="text-sm text-slate-500">
+                  Este leilão ainda não recebeu lances.
+                </p>
+              </div>
             ) : (
               <div className="mt-5 space-y-3">
                 {bids.map((bid, index) => (
                   <div
                     key={bid.bid_id}
-                    className="flex items-center justify-between gap-4 rounded-xl border border-white/10 p-4"
+                    className={`flex items-center justify-between gap-4 rounded-2xl border p-4 ${
+                      index === 0
+                        ? "border-emerald-200 bg-emerald-50"
+                        : "border-blue-100 bg-slate-50"
+                    }`}
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-bold">
+                      <p className="truncate text-sm font-bold text-[#071a4c]">
                         {bid.is_own
                           ? "Você"
                           : bid.bidder_display_name ||
@@ -491,16 +544,18 @@ export function AuctionDetail({
                             "Master"}
                       </p>
 
-                      <p className="mt-1 text-xs text-zinc-500">
+                      <p className="mt-1 text-xs text-slate-500">
                         {formatDate(bid.created_at)}
                       </p>
                     </div>
 
-                    <div className="text-right">
-                      <p className="font-black">{formatCurrency(bid.amount)}</p>
+                    <div className="shrink-0 text-right">
+                      <p className="font-black text-[#071a4c]">
+                        {formatCurrency(bid.amount)}
+                      </p>
 
                       {index === 0 && (
-                        <p className="mt-1 text-xs font-bold text-emerald-300">
+                        <p className="mt-1 text-xs font-bold text-emerald-700">
                           Maior lance
                         </p>
                       )}

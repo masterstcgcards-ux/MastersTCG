@@ -1,5 +1,5 @@
-import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import { DeckBuilder } from "@/components/deck-builder";
 import { createClient } from "@/lib/supabase/server";
@@ -80,13 +80,17 @@ async function DeckContent({ params }: DeckPageProps) {
 
   if (collectionError || deckCardsError) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#09090f] px-6 text-white">
-        <div className="w-full max-w-xl rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-red-200">
-          <h1 className="text-xl font-bold">
+      <main className="flex min-h-screen items-center justify-center bg-blue-50 px-6 text-[#071a4c]">
+        <div className="w-full max-w-xl rounded-3xl border border-red-200 bg-white p-6 shadow-xl shadow-red-950/5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-xl font-black text-red-600">
+            !
+          </div>
+
+          <h1 className="mt-5 text-xl font-black text-[#071a4c]">
             Não foi possível carregar o deck
           </h1>
 
-          <p className="mt-2 text-sm">
+          <p className="mt-2 text-sm leading-relaxed text-red-700">
             {collectionError?.message ||
               deckCardsError?.message ||
               "Ocorreu um erro inesperado."}
@@ -138,8 +142,8 @@ async function DeckContent({ params }: DeckPageProps) {
 
 function DeckLoading() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#09090f] text-white">
-      <p className="text-zinc-400">Carregando o deck...</p>
+    <main className="flex min-h-screen items-center justify-center bg-blue-50 text-[#071a4c]">
+      <p className="font-semibold text-slate-500">Carregando o deck...</p>
     </main>
   );
 }

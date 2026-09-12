@@ -47,10 +47,10 @@ const statusLabels: Record<string, string> = {
 };
 
 const statusStyles: Record<string, string> = {
-  pending: "bg-yellow-500/15 text-yellow-200",
-  accepted: "bg-green-500/15 text-green-200",
-  rejected: "bg-red-500/15 text-red-200",
-  cancelled: "bg-zinc-500/15 text-zinc-400",
+  pending: "border border-amber-200 bg-amber-100 text-amber-800",
+  accepted: "border border-emerald-200 bg-emerald-100 text-emerald-700",
+  rejected: "border border-red-200 bg-red-100 text-red-700",
+  cancelled: "border border-slate-200 bg-slate-100 text-slate-600",
 };
 
 function formatDate(value: string) {
@@ -251,27 +251,33 @@ export function TradeOffersManager({
 
   return (
     <div className="space-y-7">
-      <section className="rounded-2xl border border-white/10 bg-[#11111b] p-5">
+      <section className="rounded-2xl border border-blue-100 bg-blue-50 p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-5">
           <div>
-            <h2 className="text-xl font-black">Central de propostas</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-700">
+              Área de negociação
+            </p>
 
-            <p className="mt-2 text-sm text-zinc-400">
+            <h2 className="mt-2 text-xl font-black text-[#071a4c]">
+              Central de propostas
+            </h2>
+
+            <p className="mt-2 text-sm text-slate-600">
               Analise propostas recebidas e acompanhe as que você enviou.
             </p>
           </div>
 
-          <div className="flex rounded-xl border border-white/10 bg-black/20 p-1">
+          <div className="flex rounded-xl border border-blue-200 bg-white p-1 shadow-sm">
             <button
               type="button"
               onClick={() => {
                 setCurrentTab("received");
                 setStatusFilter("all");
               }}
-              className={`rounded-lg px-4 py-2 text-sm font-bold ${
+              className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
                 currentTab === "received"
-                  ? "bg-violet-600 text-white"
-                  : "text-zinc-400"
+                  ? "bg-blue-700 text-white"
+                  : "text-slate-600 hover:text-blue-700"
               }`}
             >
               Recebidas
@@ -284,10 +290,10 @@ export function TradeOffersManager({
                 setCurrentTab("sent");
                 setStatusFilter("all");
               }}
-              className={`rounded-lg px-4 py-2 text-sm font-bold ${
+              className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
                 currentTab === "sent"
-                  ? "bg-violet-600 text-white"
-                  : "text-zinc-400"
+                  ? "bg-blue-700 text-white"
+                  : "text-slate-600 hover:text-blue-700"
               }`}
             >
               Enviadas
@@ -298,7 +304,7 @@ export function TradeOffersManager({
         <div className="mt-5 max-w-xs">
           <label
             htmlFor="offer-status-filter"
-            className="text-sm font-semibold text-zinc-300"
+            className="text-sm font-semibold text-[#071a4c]"
           >
             Filtrar por situação
           </label>
@@ -307,7 +313,7 @@ export function TradeOffersManager({
             id="offer-status-filter"
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
+            className="mt-2 w-full rounded-xl border border-blue-200 bg-white px-4 py-3 text-[#071a4c] outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
           >
             <option value="all">Todas</option>
             <option value="pending">Pendentes</option>
@@ -321,7 +327,7 @@ export function TradeOffersManager({
       {message && (
         <div
           role="status"
-          className="rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-green-200"
+          className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-medium text-emerald-700"
         >
           {message}
         </div>
@@ -330,14 +336,14 @@ export function TradeOffersManager({
       {error && (
         <div
           role="alert"
-          className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 font-medium text-red-700"
         >
           {error}
         </div>
       )}
 
       {displayedOffers.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/15 p-10 text-center text-zinc-400">
+        <div className="rounded-2xl border border-dashed border-blue-200 bg-blue-50/40 p-10 text-center text-slate-500">
           {currentTab === "received"
             ? "Você não possui propostas recebidas neste filtro."
             : "Você não possui propostas enviadas neste filtro."}
@@ -350,17 +356,17 @@ export function TradeOffersManager({
             return (
               <article
                 key={offer.offer_id}
-                className="rounded-2xl border border-white/10 bg-[#13131d] p-6"
+                className="overflow-hidden rounded-3xl border border-blue-100 bg-white p-5 shadow-sm sm:p-7"
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-violet-400">
+                    <p className="text-xs font-bold uppercase tracking-wider text-blue-700">
                       {currentTab === "received"
                         ? `Proposta de ${offer.sender_display_name}`
                         : `Enviada para ${offer.recipient_display_name}`}
                     </p>
 
-                    <h3 className="mt-2 text-2xl font-black">
+                    <h3 className="mt-2 text-2xl font-black text-[#071a4c]">
                       {offer.listing_title}
                     </h3>
                   </div>
@@ -374,96 +380,111 @@ export function TradeOffersManager({
                   </span>
                 </div>
 
-                <div className="mt-6 grid items-stretch gap-4 md:grid-cols-[1fr_auto_1fr]">
-                  <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-                    <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+                <div className="mt-6 grid items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-5">
+                  <div className="min-w-0 rounded-2xl border border-blue-100 bg-slate-50 p-3 sm:p-5">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
                       Carta anunciada
                     </p>
 
-                    <div className="mt-4 flex min-h-48 items-center justify-center">
-                      {offer.listing_image_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={offer.listing_image_url}
-                          alt={offer.listing_card_name}
-                          className="max-h-52 max-w-full rounded-lg object-contain"
-                        />
-                      ) : (
-                        <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-violet-600/20 text-2xl font-black text-violet-300">
-                          M
-                        </div>
-                      )}
+                    <div className="mt-4 flex justify-center">
+                      <div className="flex aspect-[2.5/3.5] w-full max-w-[220px] items-center justify-center overflow-hidden rounded-xl bg-white p-2 shadow-sm">
+                        {offer.listing_image_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={offer.listing_image_url}
+                            alt={offer.listing_card_name}
+                            className="h-full w-full object-contain"
+                          />
+                        ) : (
+                          <div className="flex h-24 w-16 flex-col items-center justify-center rounded-xl bg-blue-700 text-white">
+                            <span className="text-3xl font-black">M</span>
+                            <span className="text-[8px] font-bold tracking-wider text-yellow-300">
+                              TCG
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <p className="mt-4 font-bold">{offer.listing_card_name}</p>
+                    <p className="mt-4 break-words font-bold text-[#071a4c]">
+                      {offer.listing_card_name}
+                    </p>
 
-                    <p className="mt-1 text-sm text-zinc-500">
+                    <p className="mt-1 break-words text-sm text-slate-500">
                       {[offer.listing_set_name, offer.listing_card_number]
                         .filter(Boolean)
                         .join(" • ") || "Sem detalhes adicionais"}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-center text-3xl font-black text-violet-400">
-                    ⇄
+                  <div className="flex items-center justify-center text-3xl font-black text-blue-700">
+                    <span className="sm:hidden">⇅</span>
+                    <span className="hidden sm:inline">⇄</span>
                   </div>
 
-                  <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4">
-                    <p className="text-xs font-bold uppercase tracking-wider text-violet-300">
+                  <div className="min-w-0 rounded-2xl border border-blue-200 bg-blue-50 p-3 sm:p-5">
+                    <p className="text-xs font-bold uppercase tracking-wider text-blue-700">
                       Carta oferecida
                     </p>
 
-                    <div className="mt-4 flex min-h-48 items-center justify-center">
-                      {offer.offered_image_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={offer.offered_image_url}
-                          alt={offer.offered_card_name}
-                          className="max-h-52 max-w-full rounded-lg object-contain"
-                        />
-                      ) : (
-                        <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-violet-600/20 text-2xl font-black text-violet-300">
-                          M
-                        </div>
-                      )}
+                    <div className="mt-4 flex justify-center">
+                      <div className="flex aspect-[2.5/3.5] w-full max-w-[220px] items-center justify-center overflow-hidden rounded-xl bg-white p-2 shadow-sm">
+                        {offer.offered_image_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={offer.offered_image_url}
+                            alt={offer.offered_card_name}
+                            className="h-full w-full object-contain"
+                          />
+                        ) : (
+                          <div className="flex h-24 w-16 flex-col items-center justify-center rounded-xl bg-blue-700 text-white">
+                            <span className="text-3xl font-black">M</span>
+                            <span className="text-[8px] font-bold tracking-wider text-yellow-300">
+                              TCG
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <p className="mt-4 font-bold">{offer.offered_card_name}</p>
+                    <p className="mt-4 break-words font-bold text-[#071a4c]">
+                      {offer.offered_card_name}
+                    </p>
 
-                    <p className="mt-1 text-sm text-zinc-500">
+                    <p className="mt-1 break-words text-sm text-slate-500">
                       {[offer.offered_set_name, offer.offered_card_number]
                         .filter(Boolean)
                         .join(" • ") || "Sem detalhes adicionais"}
                     </p>
 
-                    <p className="mt-2 text-sm font-semibold text-violet-200">
+                    <p className="mt-2 text-sm font-bold text-blue-700">
                       Quantidade: {offer.offered_quantity}
                     </p>
                   </div>
                 </div>
 
                 {offer.offer_message && (
-                  <div className="mt-5 rounded-xl border border-white/10 p-4">
-                    <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+                  <div className="mt-5 rounded-xl border border-blue-100 bg-slate-50 p-4">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
                       Mensagem
                     </p>
 
-                    <p className="mt-2 whitespace-pre-wrap break-words text-sm text-zinc-300">
+                    <p className="mt-2 whitespace-pre-wrap break-words text-sm text-slate-700">
                       {offer.offer_message}
                     </p>
                   </div>
                 )}
 
                 {offer.offer_status === "accepted" && (
-                  <div className="mt-5 rounded-xl border border-green-500/20 bg-green-500/10 p-4 text-sm text-green-100">
-                    Proposta aceita. As cartas ainda não foram transferidas
-                    automaticamente. Os participantes devem combinar a conclusão
-                    da troca com segurança.
+                  <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-relaxed text-emerald-800">
+                    <strong>Proposta aceita.</strong> As cartas ainda não foram
+                    transferidas automaticamente. Os participantes devem
+                    combinar a conclusão da troca com segurança.
                   </div>
                 )}
 
-                <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
-                  <p className="text-xs text-zinc-600">
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-blue-100 pt-5">
+                  <p className="text-xs text-slate-400">
                     Enviada em {formatDate(offer.created_at)}
                   </p>
 
@@ -477,7 +498,7 @@ export function TradeOffersManager({
                             onClick={() =>
                               handleRespond(offer.offer_id, "accepted")
                             }
-                            className="rounded-xl bg-green-600 px-5 py-3 text-sm font-bold text-white hover:bg-green-500 disabled:opacity-50"
+                            className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:opacity-50"
                           >
                             {updating ? "Atualizando..." : "Aceitar"}
                           </button>
@@ -488,7 +509,7 @@ export function TradeOffersManager({
                             onClick={() =>
                               handleRespond(offer.offer_id, "rejected")
                             }
-                            className="rounded-xl border border-red-500/30 px-5 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                            className="rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-bold text-red-700 transition hover:bg-red-100 disabled:opacity-50"
                           >
                             Recusar
                           </button>
@@ -501,7 +522,7 @@ export function TradeOffersManager({
                           type="button"
                           disabled={updating}
                           onClick={() => handleCancel(offer.offer_id, false)}
-                          className="rounded-xl border border-red-500/30 px-5 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                          className="rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-bold text-red-700 transition hover:bg-red-100 disabled:opacity-50"
                         >
                           {updating ? "Cancelando..." : "Cancelar proposta"}
                         </button>
@@ -512,7 +533,7 @@ export function TradeOffersManager({
                         type="button"
                         disabled={updating}
                         onClick={() => handleCancel(offer.offer_id, true)}
-                        className="rounded-xl border border-red-500/30 px-5 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                        className="rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-bold text-red-700 transition hover:bg-red-100 disabled:opacity-50"
                       >
                         {updating ? "Cancelando..." : "Cancelar acordo"}
                       </button>

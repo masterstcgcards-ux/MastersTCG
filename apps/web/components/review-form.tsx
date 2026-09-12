@@ -63,7 +63,10 @@ export function ReviewForm({
 
   if (submitted) {
     return (
-      <div className="mt-5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-200">
+      <div
+        role="status"
+        className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700"
+      >
         {message}
       </div>
     );
@@ -72,76 +75,82 @@ export function ReviewForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="mt-5 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-5"
+      className="mt-5 overflow-hidden rounded-2xl border border-amber-200 bg-white"
     >
-      <p className="text-xs font-bold uppercase tracking-[0.2em] text-yellow-200">
-        Avaliar negociação
-      </p>
+      <div className="border-b border-amber-200 bg-amber-50 p-5">
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-700">
+          Avaliar negociação
+        </p>
 
-      <h4 className="mt-2 font-bold">Como foi negociar com {reviewedName}?</h4>
-
-      <div
-        className="mt-4 flex flex-wrap gap-2"
-        role="radiogroup"
-        aria-label="Nota da avaliação"
-      >
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            role="radio"
-            aria-checked={rating === star}
-            onClick={() => setRating(star)}
-            className={`rounded-lg border px-3 py-2 text-xl transition ${
-              star <= rating
-                ? "border-yellow-400/50 bg-yellow-500/15 text-yellow-300"
-                : "border-white/10 text-zinc-600 hover:text-yellow-300"
-            }`}
-            aria-label={`${star} ${star === 1 ? "estrela" : "estrelas"}`}
-          >
-            ★
-          </button>
-        ))}
+        <h4 className="mt-2 font-black text-[#071a4c]">
+          Como foi negociar com {reviewedName}?
+        </h4>
       </div>
 
-      <p className="mt-2 text-sm font-semibold text-yellow-100">
-        {rating} {rating === 1 ? "estrela" : "estrelas"}
-      </p>
-
-      <div className="mt-4">
-        <label
-          htmlFor={`review-comment-${orderId}`}
-          className="mb-2 block text-sm font-semibold"
-        >
-          Comentário opcional
-        </label>
-
-        <textarea
-          id={`review-comment-${orderId}`}
-          name="comment"
-          rows={3}
-          maxLength={1000}
-          placeholder="Conte como foi a negociação, comunicação e entrega."
-          className="w-full resize-none rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-yellow-400"
-        />
-      </div>
-
-      {error && (
+      <div className="p-5">
         <div
-          role="alert"
-          className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200"
+          className="flex flex-wrap gap-2"
+          role="radiogroup"
+          aria-label="Nota da avaliação"
         >
-          {error}
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              role="radio"
+              aria-checked={rating === star}
+              onClick={() => setRating(star)}
+              className={`rounded-xl border px-3 py-2 text-xl transition ${
+                star <= rating
+                  ? "border-amber-300 bg-amber-100 text-amber-500 shadow-sm"
+                  : "border-slate-200 bg-white text-slate-300 hover:border-amber-200 hover:text-amber-400"
+              }`}
+              aria-label={`${star} ${star === 1 ? "estrela" : "estrelas"}`}
+            >
+              ★
+            </button>
+          ))}
         </div>
-      )}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="mt-4 rounded-xl bg-yellow-500 px-5 py-3 text-sm font-black text-black hover:bg-yellow-400 disabled:opacity-50"
-      >
-        {submitting ? "Enviando..." : "Enviar avaliação"}
-      </button>
+        <p className="mt-3 text-sm font-bold text-amber-700">
+          {rating} {rating === 1 ? "estrela" : "estrelas"}
+        </p>
+
+        <div className="mt-5">
+          <label
+            htmlFor={`review-comment-${orderId}`}
+            className="mb-2 block text-sm font-bold text-[#071a4c]"
+          >
+            Comentário opcional
+          </label>
+
+          <textarea
+            id={`review-comment-${orderId}`}
+            name="comment"
+            rows={3}
+            maxLength={1000}
+            placeholder="Conte como foi a negociação, comunicação e entrega."
+            className="w-full resize-none rounded-xl border border-amber-200 bg-white px-4 py-3 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-100"
+          />
+        </div>
+
+        {error && (
+          <div
+            role="alert"
+            className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700"
+          >
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={submitting}
+          className="mt-5 rounded-xl bg-amber-400 px-5 py-3 text-sm font-black text-[#071a4c] transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {submitting ? "Enviando..." : "Enviar avaliação"}
+        </button>
+      </div>
     </form>
   );
 }

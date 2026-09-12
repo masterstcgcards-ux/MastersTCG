@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -20,7 +19,9 @@ type ProfileFormProps = {
 };
 
 const fieldClass =
-  "mt-2 w-full rounded-xl border border-white/15 bg-[#181822] px-4 py-3 text-white outline-none transition focus:border-violet-400";
+  "mt-2 w-full rounded-xl border border-blue-100 bg-white px-4 py-3 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100";
+
+const labelClass = "text-sm font-bold text-[#071a4c]";
 
 export function ProfileForm({ profile }: ProfileFormProps) {
   const [displayName, setDisplayName] = useState(profile.display_name || "");
@@ -141,64 +142,87 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-      <aside className="rounded-3xl border border-white/10 bg-gradient-to-br from-violet-950/70 to-[#13131d] p-7">
-        <div className="flex h-24 w-24 items-center justify-center rounded-3xl border border-violet-400/30 bg-violet-600 text-4xl font-black shadow-xl shadow-violet-950/50">
-          {(displayName || username || "M").charAt(0).toUpperCase()}
+      <aside className="relative h-fit overflow-hidden rounded-3xl bg-gradient-to-br from-[#071a4c] via-blue-800 to-blue-600 p-7 text-white shadow-lg">
+        <div
+          aria-hidden="true"
+          className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-yellow-400/25 blur-3xl"
+        />
+
+        <div className="relative">
+          <div className="flex h-24 w-24 items-center justify-center rounded-3xl border-4 border-white/20 bg-yellow-400 text-4xl font-black text-[#071a4c] shadow-xl">
+            {(displayName || username || "M").charAt(0).toUpperCase()}
+          </div>
+
+          <p className="mt-6 text-sm font-bold uppercase tracking-[0.2em] text-yellow-300">
+            Perfil Master
+          </p>
+
+          <h2 className="mt-2 break-words text-3xl font-black">
+            {displayName || "Novo Master"}
+          </h2>
+
+          <p className="mt-2 break-words text-blue-100">
+            @{username || "escolha-seu-usuario"}
+          </p>
+
+          {bio && (
+            <p className="mt-5 whitespace-pre-wrap break-words leading-relaxed text-blue-50">
+              {bio}
+            </p>
+          )}
+
+          <dl className="mt-8 divide-y divide-white/15 border-t border-white/15">
+            <div className="flex justify-between gap-4 py-4">
+              <dt className="text-blue-100">Cartas</dt>
+              <dd className="font-black text-yellow-300">
+                {profile.totalCards}
+              </dd>
+            </div>
+
+            <div className="py-4">
+              <dt className="text-blue-100">Master desde</dt>
+              <dd className="mt-1 font-bold text-white">{membershipDate}</dd>
+            </div>
+          </dl>
         </div>
-
-        <p className="mt-6 text-sm font-bold uppercase tracking-[0.2em] text-violet-300">
-          Perfil Master
-        </p>
-
-        <h2 className="mt-2 text-3xl font-black">
-          {displayName || "Novo Master"}
-        </h2>
-
-        <p className="mt-2 text-zinc-400">
-          @{username || "escolha-seu-usuario"}
-        </p>
-
-        {bio && <p className="mt-5 whitespace-pre-wrap text-zinc-300">{bio}</p>}
-
-        <dl className="mt-8 divide-y divide-white/10 border-t border-white/10">
-          <div className="flex justify-between gap-4 py-4">
-            <dt className="text-zinc-400">Cartas</dt>
-            <dd className="font-bold text-violet-300">{profile.totalCards}</dd>
-          </div>
-
-          <div className="py-4">
-            <dt className="text-zinc-400">Master desde</dt>
-            <dd className="mt-1 font-semibold">{membershipDate}</dd>
-          </div>
-        </dl>
       </aside>
 
-      <section className="rounded-3xl border border-white/10 bg-[#13131d] p-6 sm:p-8">
-        <p className="text-sm font-bold uppercase tracking-[0.2em] text-violet-400">
+      <section className="rounded-3xl border border-blue-100 bg-white p-5 shadow-sm sm:p-8">
+        <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-600">
           Editar perfil
         </p>
 
-        <h2 className="mt-2 text-2xl font-black">Suas informações</h2>
+        <h2 className="mt-2 text-2xl font-black text-[#071a4c]">
+          Suas informações
+        </h2>
+
+        <p className="mt-2 text-sm text-slate-600">
+          Mantenha seus dados atualizados para ser reconhecido pela comunidade.
+        </p>
 
         <form onSubmit={handleSubmit} className="mt-7 space-y-5">
           <div>
-            <label htmlFor="email">E-mail da conta</label>
+            <label htmlFor="email" className={labelClass}>
+              E-mail da conta
+            </label>
 
             <input
               id="email"
               type="email"
               value={profile.email}
               disabled
-              className={`${fieldClass} cursor-not-allowed opacity-60`}
+              className={`${fieldClass} cursor-not-allowed bg-slate-50 opacity-70`}
             />
 
-            <p className="mt-2 text-xs text-zinc-500">
+            <p className="mt-2 text-xs text-slate-500">
               O e-mail não pode ser alterado nesta tela.
             </p>
           </div>
 
           <div>
-            <label htmlFor="display_name">Nome de exibição *</label>
+            <label htmlFor="display_name" className={labelClass}>
+              Nome de exibição *
+            </label>
 
             <input
               id="display_name"
@@ -213,10 +237,12 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           </div>
 
           <div>
-            <label htmlFor="username">Nome de usuário *</label>
+            <label htmlFor="username" className={labelClass}>
+              Nome de usuário *
+            </label>
 
             <div className="relative">
-              <span className="pointer-events-none absolute left-4 top-1/2 mt-1 -translate-y-1/2 text-zinc-500">
+              <span className="pointer-events-none absolute left-4 top-1/2 mt-1 -translate-y-1/2 font-bold text-blue-600">
                 @
               </span>
 
@@ -236,16 +262,20 @@ export function ProfileForm({ profile }: ProfileFormProps) {
               />
             </div>
 
-            <p className="mt-2 text-xs text-zinc-500">
+            <p className="mt-2 text-xs text-slate-500">
               Use letras minúsculas, números, ponto ou underline.
             </p>
           </div>
 
           <div>
             <div className="flex justify-between gap-4">
-              <label htmlFor="bio">Biografia</label>
+              <label htmlFor="bio" className={labelClass}>
+                Biografia
+              </label>
 
-              <span className="text-xs text-zinc-500">{bio.length}/300</span>
+              <span className="text-xs font-semibold text-slate-500">
+                {bio.length}/300
+              </span>
             </div>
 
             <textarea
@@ -255,17 +285,17 @@ export function ProfileForm({ profile }: ProfileFormProps) {
               rows={5}
               maxLength={300}
               placeholder="Conte um pouco sobre você e sua coleção."
-              className={fieldClass}
+              className={`${fieldClass} resize-none`}
             />
           </div>
 
           {message && (
             <p
               role={success ? "status" : "alert"}
-              className={`rounded-xl border p-4 text-sm ${
+              className={`rounded-xl border p-4 text-sm font-semibold ${
                 success
-                  ? "border-green-500/30 bg-green-500/10 text-green-200"
-                  : "border-red-500/30 bg-red-500/10 text-red-200"
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : "border-red-200 bg-red-50 text-red-700"
               }`}
             >
               {message}
@@ -275,7 +305,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           <button
             type="submit"
             disabled={saving}
-            className="w-full rounded-xl bg-violet-600 px-6 py-3 font-bold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-xl bg-blue-600 px-6 py-4 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {saving ? "Salvando perfil..." : "Salvar perfil"}
           </button>

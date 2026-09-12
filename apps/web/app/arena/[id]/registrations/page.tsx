@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import {
   RegistrationReview,
@@ -47,13 +48,13 @@ async function RegistrationsContent({ params }: RegistrationsPageProps) {
     .from("tournaments")
     .select(
       `
-          id,
-          name,
-          format,
-          status,
-          starts_at,
-          max_players
-        `,
+        id,
+        name,
+        format,
+        status,
+        starts_at,
+        max_players
+      `,
     )
     .eq("id", tournamentId)
     .maybeSingle();
@@ -70,27 +71,34 @@ async function RegistrationsContent({ params }: RegistrationsPageProps) {
   );
 
   return (
-    <main className="min-h-screen bg-[#09090f] text-white">
-      <header className="border-b border-white/10 bg-[#0d0d16]">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-6 py-5">
-          <Link href="/" className="text-2xl font-black tracking-tight">
-            MASTERS<span className="text-violet-400">TCG</span>
+    <main className="min-h-screen bg-gradient-to-b from-blue-50/70 to-slate-50 text-[#071a4c]">
+      <header className="border-b border-blue-100 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-5 py-4 sm:px-6">
+          <Link href="/" aria-label="MastersTCG — início">
+            <Image
+              src="/masters-logo.png"
+              alt="MastersTCG"
+              width={260}
+              height={70}
+              priority
+              className="h-auto w-44 sm:w-52"
+            />
           </Link>
 
-          <nav className="flex flex-wrap items-center gap-5 text-sm text-zinc-400">
-            <Link href="/collection" className="hover:text-white">
+          <nav className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold text-slate-600">
+            <Link href="/collection" className="transition hover:text-blue-700">
               Minha coleção
             </Link>
 
-            <Link href="/decks" className="hover:text-white">
+            <Link href="/decks" className="transition hover:text-blue-700">
               Meus decks
             </Link>
 
-            <Link href="/arena" className="font-semibold text-white">
+            <Link href="/arena" className="font-bold text-blue-700">
               Arena
             </Link>
 
-            <Link href="/profile" className="hover:text-white">
+            <Link href="/profile" className="transition hover:text-blue-700">
               Meu perfil
             </Link>
           </nav>
@@ -99,40 +107,52 @@ async function RegistrationsContent({ params }: RegistrationsPageProps) {
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 py-10">
-        <Link href="/arena" className="text-sm text-zinc-400 hover:text-white">
+      <section className="mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-14">
+        <Link
+          href="/arena"
+          className="inline-flex rounded-xl border border-blue-100 bg-white px-4 py-2.5 text-sm font-bold text-blue-700 shadow-sm transition hover:bg-blue-50"
+        >
           ← Voltar para a Arena
         </Link>
 
-        <div className="mt-6 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-400">
-              Administração da Arena
-            </p>
+        <div className="relative mt-7 overflow-hidden rounded-3xl bg-gradient-to-br from-[#071a4c] via-blue-800 to-blue-600 px-6 py-9 text-white shadow-lg sm:px-10 sm:py-12">
+          <div
+            aria-hidden="true"
+            className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-yellow-400/25 blur-3xl"
+          />
 
-            <h1 className="mt-3 text-3xl font-black sm:text-4xl">Inscrições</h1>
+          <div className="relative flex flex-col justify-between gap-7 sm:flex-row sm:items-end">
+            <div>
+              <span className="inline-flex rounded-full border border-yellow-300/40 bg-yellow-300/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-yellow-300">
+                Administração da Arena
+              </span>
 
-            <p className="mt-3 break-words text-xl font-bold text-zinc-200">
-              {tournament.name}
-            </p>
+              <h1 className="mt-5 text-3xl font-black sm:text-5xl">
+                Inscrições
+              </h1>
 
-            <p className="mt-2 text-sm text-zinc-400">
-              Revise os jogadores e as listas de cartas enviadas antes de
-              confirmar a participação.
-            </p>
-          </div>
+              <p className="mt-3 break-words text-xl font-bold text-white">
+                {tournament.name}
+              </p>
 
-          <div className="rounded-2xl border border-white/10 bg-[#11111b] px-6 py-4">
-            <p className="text-sm text-zinc-400">Capacidade do torneio</p>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-blue-100">
+                Revise os jogadores e as listas de cartas enviadas antes de
+                confirmar a participação.
+              </p>
+            </div>
 
-            <p className="mt-1 text-2xl font-black">
-              {tournament.max_players} jogadores
-            </p>
+            <div className="shrink-0 rounded-2xl border border-white/20 bg-white/10 px-6 py-4 backdrop-blur-sm">
+              <p className="text-sm text-blue-100">Capacidade do torneio</p>
+
+              <p className="mt-1 text-2xl font-black text-yellow-300">
+                {tournament.max_players} jogadores
+              </p>
+            </div>
           </div>
         </div>
 
         {tournament.status === "cancelled" && (
-          <div className="mt-8 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200">
+          <div className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-4 font-semibold text-red-700">
             Este torneio foi cancelado. As inscrições permanecem disponíveis
             apenas para consulta do histórico.
           </div>
@@ -141,10 +161,12 @@ async function RegistrationsContent({ params }: RegistrationsPageProps) {
         {registrationsError ? (
           <div
             role="alert"
-            className="mt-8 rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-red-200"
+            className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700"
           >
-            Não foi possível carregar as inscrições:{" "}
-            {registrationsError.message}
+            <p className="font-bold">
+              Não foi possível carregar as inscrições.
+            </p>
+            <p className="mt-2 text-sm">{registrationsError.message}</p>
           </div>
         ) : (
           <div className="mt-8">
@@ -162,10 +184,14 @@ async function RegistrationsContent({ params }: RegistrationsPageProps) {
 
 function RegistrationsLoading() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#09090f] text-white">
-      <p role="status" className="text-zinc-400">
-        Carregando inscrições...
-      </p>
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-blue-50/70 to-slate-50">
+      <div className="rounded-2xl border border-blue-100 bg-white px-8 py-6 text-center shadow-sm">
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
+
+        <p role="status" className="mt-4 font-semibold text-slate-600">
+          Carregando inscrições...
+        </p>
+      </div>
     </main>
   );
 }

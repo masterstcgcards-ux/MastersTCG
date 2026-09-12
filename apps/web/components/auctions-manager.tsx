@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -61,11 +61,16 @@ const statusLabels: Record<string, string> = {
 };
 
 const statusStyles: Record<string, string> = {
-  draft: "bg-zinc-500/15 text-zinc-300",
-  active: "bg-emerald-500/15 text-emerald-200",
-  ended: "bg-violet-500/15 text-violet-200",
-  cancelled: "bg-red-500/15 text-red-200",
+  draft: "border-slate-200 bg-slate-50 text-slate-600",
+  active: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  ended: "border-blue-200 bg-blue-50 text-blue-700",
+  cancelled: "border-red-200 bg-red-50 text-red-700",
 };
+
+const inputClass =
+  "w-full rounded-xl border border-blue-100 bg-white px-4 py-3 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100";
+
+const labelClass = "mb-2 block text-sm font-bold text-[#071a4c]";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("pt-BR", {
@@ -265,23 +270,30 @@ export function AuctionsManager({
 
   return (
     <div>
-      <section className="rounded-2xl border border-white/10 bg-[#13131d] p-6">
-        <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
+      <section className="rounded-3xl border border-blue-100 bg-white p-5 shadow-sm sm:p-7">
+        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div>
-            <h2 className="text-2xl font-black">Central de leilões</h2>
-            <p className="mt-2 text-sm text-zinc-400">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-blue-600">
+              Área de disputas
+            </p>
+
+            <h2 className="mt-2 text-2xl font-black text-[#071a4c]">
+              Central de leilões
+            </h2>
+
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
               Dispute cartas, acompanhe seus lances e publique seus leilões.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2 rounded-xl border border-white/10 bg-black/20 p-1">
+          <div className="grid grid-cols-3 rounded-2xl border border-blue-100 bg-blue-50 p-1">
             <button
               type="button"
               onClick={() => changeTab("all")}
-              className={`rounded-lg px-4 py-2 text-sm font-bold ${
+              className={`rounded-xl px-3 py-3 text-xs font-bold transition sm:px-4 sm:text-sm ${
                 currentTab === "all"
-                  ? "bg-violet-600 text-white"
-                  : "text-zinc-400 hover:text-white"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "text-slate-600 hover:bg-white hover:text-blue-700"
               }`}
             >
               Explorar
@@ -290,10 +302,10 @@ export function AuctionsManager({
             <button
               type="button"
               onClick={() => changeTab("bids")}
-              className={`rounded-lg px-4 py-2 text-sm font-bold ${
+              className={`rounded-xl px-3 py-3 text-xs font-bold transition sm:px-4 sm:text-sm ${
                 currentTab === "bids"
-                  ? "bg-violet-600 text-white"
-                  : "text-zinc-400 hover:text-white"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "text-slate-600 hover:bg-white hover:text-blue-700"
               }`}
             >
               Meus lances
@@ -302,10 +314,10 @@ export function AuctionsManager({
             <button
               type="button"
               onClick={() => changeTab("mine")}
-              className={`rounded-lg px-4 py-2 text-sm font-bold ${
+              className={`rounded-xl px-3 py-3 text-xs font-bold transition sm:px-4 sm:text-sm ${
                 currentTab === "mine"
-                  ? "bg-violet-600 text-white"
-                  : "text-zinc-400 hover:text-white"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "text-slate-600 hover:bg-white hover:text-blue-700"
               }`}
             >
               Meus leilões
@@ -317,7 +329,7 @@ export function AuctionsManager({
           <button
             type="button"
             onClick={() => setShowCreateForm((current) => !current)}
-            className="mt-6 rounded-xl bg-violet-600 px-5 py-3 text-sm font-bold text-white hover:bg-violet-500"
+            className="mt-6 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
           >
             {showCreateForm ? "Fechar formulário" : "Criar novo leilão"}
           </button>
@@ -325,7 +337,10 @@ export function AuctionsManager({
       </section>
 
       {message && (
-        <div className="mt-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-200">
+        <div
+          role="status"
+          className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-700"
+        >
           {message}
         </div>
       )}
@@ -333,7 +348,7 @@ export function AuctionsManager({
       {error && (
         <div
           role="alert"
-          className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200"
+          className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 font-semibold text-red-700"
         >
           {error}
         </div>
@@ -342,272 +357,312 @@ export function AuctionsManager({
       {currentTab === "mine" && showCreateForm && (
         <form
           onSubmit={handleCreateAuction}
-          className="mt-6 rounded-2xl border border-violet-500/20 bg-[#13131d] p-6 sm:p-8"
+          className="mt-6 overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm"
         >
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.25em] text-violet-400">
+          <div className="border-b border-blue-100 bg-gradient-to-r from-blue-50 to-white p-6 sm:p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-600">
               Novo leilão
             </p>
-            <h3 className="mt-2 text-2xl font-black">
+
+            <h3 className="mt-2 text-2xl font-black text-[#071a4c]">
               Coloque uma carta em disputa
             </h3>
+
+            <p className="mt-2 text-sm text-slate-600">
+              Escolha uma carta, defina os valores e determine quando o leilão
+              será encerrado.
+            </p>
           </div>
 
-          {collectionCards.length === 0 ? (
-            <div className="mt-6 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-5 text-yellow-100">
-              Você precisa adicionar uma carta à sua coleção antes de criar um
-              leilão.
-              <div>
+          <div className="p-5 sm:p-8">
+            {collectionCards.length === 0 ? (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-900">
+                <p className="font-semibold">
+                  Você precisa adicionar uma carta à sua coleção antes de criar
+                  um leilão.
+                </p>
+
                 <Link
                   href="/collection/scan"
-                  className="mt-4 inline-flex font-bold text-yellow-200 underline"
+                  className="mt-4 inline-flex rounded-xl bg-amber-400 px-5 py-3 text-sm font-bold text-[#071a4c] transition hover:bg-amber-300"
                 >
                   Adicionar carta
                 </Link>
               </div>
-            </div>
-          ) : (
-            <>
-              <div className="mt-8 grid gap-6 lg:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="auction-card"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Carta
-                  </label>
-
-                  <select
-                    id="auction-card"
-                    value={selectedCardId}
-                    onChange={(event) => setSelectedCardId(event.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-[#0d0d16] px-4 py-3 outline-none focus:border-violet-500"
-                  >
-                    {collectionCards.map((card) => (
-                      <option key={card.id} value={card.id}>
-                        {card.card_name || "Carta sem nome"} — {card.quantity}{" "}
-                        disponível
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="auction-quantity"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Quantidade
-                  </label>
-
-                  <input
-                    id="auction-quantity"
-                    name="quantity"
-                    type="number"
-                    min={1}
-                    max={selectedCard?.quantity || 1}
-                    defaultValue={1}
-                    required
-                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
-                  />
-                </div>
-
-                <div className="lg:col-span-2">
-                  <label
-                    htmlFor="auction-title"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Título do leilão
-                  </label>
-
-                  <input
-                    id="auction-title"
-                    name="title"
-                    type="text"
-                    minLength={3}
-                    maxLength={150}
-                    placeholder="Ex.: Pikachu raro em ótimo estado"
-                    required
-                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="starting-price"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Lance inicial
-                  </label>
-
-                  <input
-                    id="starting-price"
-                    name="starting_price"
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    placeholder="10,00"
-                    required
-                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="minimum-increment"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Incremento mínimo
-                  </label>
-
-                  <input
-                    id="minimum-increment"
-                    name="minimum_increment"
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    defaultValue="1.00"
-                    required
-                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="ends-at"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Encerramento
-                  </label>
-
-                  <input
-                    id="ends-at"
-                    name="ends_at"
-                    type="datetime-local"
-                    defaultValue={getDefaultEndDate()}
-                    required
-                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
-                  />
-                </div>
-
-                <div className="grid grid-cols-[1fr_100px] gap-3">
+            ) : (
+              <>
+                <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
                   <div>
-                    <label
-                      htmlFor="auction-city"
-                      className="mb-2 block text-sm font-semibold"
-                    >
-                      Cidade
-                    </label>
+                    <div className="flex aspect-[2.5/3.5] items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-slate-50 p-4">
+                      {selectedCard?.front_image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={selectedCard.front_image_url}
+                          alt={selectedCard.card_name || "Carta selecionada"}
+                          className="h-full w-full object-contain drop-shadow-lg"
+                        />
+                      ) : (
+                        <span className="px-4 text-center text-sm text-slate-400">
+                          Imagem não disponível
+                        </span>
+                      )}
+                    </div>
 
-                    <input
-                      id="auction-city"
-                      name="city"
-                      type="text"
-                      maxLength={120}
-                      className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
-                    />
+                    {selectedCard && (
+                      <div className="mt-3 text-center">
+                        <p className="font-bold text-[#071a4c]">
+                          {selectedCard.card_name || "Carta sem nome"}
+                        </p>
+
+                        <p className="mt-1 text-xs text-slate-500">
+                          {selectedCard.quantity}{" "}
+                          {selectedCard.quantity === 1
+                            ? "unidade disponível"
+                            : "unidades disponíveis"}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor="auction-state"
-                      className="mb-2 block text-sm font-semibold"
-                    >
-                      Estado
-                    </label>
+                  <div className="grid gap-5 lg:grid-cols-2">
+                    <div>
+                      <label htmlFor="auction-card" className={labelClass}>
+                        Carta
+                      </label>
 
-                    <input
-                      id="auction-state"
-                      name="state"
-                      type="text"
-                      maxLength={2}
-                      placeholder="SP"
-                      className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 uppercase outline-none focus:border-violet-500"
-                    />
+                      <select
+                        id="auction-card"
+                        value={selectedCardId}
+                        onChange={(event) =>
+                          setSelectedCardId(event.target.value)
+                        }
+                        className={inputClass}
+                      >
+                        {collectionCards.map((card) => (
+                          <option key={card.id} value={card.id}>
+                            {card.card_name || "Carta sem nome"} —{" "}
+                            {card.quantity} disponível
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label htmlFor="auction-quantity" className={labelClass}>
+                        Quantidade
+                      </label>
+
+                      <input
+                        id="auction-quantity"
+                        name="quantity"
+                        type="number"
+                        min={1}
+                        max={selectedCard?.quantity || 1}
+                        defaultValue={1}
+                        required
+                        className={inputClass}
+                      />
+                    </div>
+
+                    <div className="lg:col-span-2">
+                      <label htmlFor="auction-title" className={labelClass}>
+                        Título do leilão
+                      </label>
+
+                      <input
+                        id="auction-title"
+                        name="title"
+                        type="text"
+                        minLength={3}
+                        maxLength={150}
+                        placeholder="Ex.: Pikachu raro em ótimo estado"
+                        required
+                        className={inputClass}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="starting-price" className={labelClass}>
+                        Lance inicial
+                      </label>
+
+                      <input
+                        id="starting-price"
+                        name="starting_price"
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="10,00"
+                        required
+                        className={inputClass}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="minimum-increment" className={labelClass}>
+                        Incremento mínimo
+                      </label>
+
+                      <input
+                        id="minimum-increment"
+                        name="minimum_increment"
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        defaultValue="1.00"
+                        required
+                        className={inputClass}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="ends-at" className={labelClass}>
+                        Encerramento
+                      </label>
+
+                      <input
+                        id="ends-at"
+                        name="ends_at"
+                        type="datetime-local"
+                        defaultValue={getDefaultEndDate()}
+                        required
+                        className={inputClass}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-[1fr_90px] gap-3">
+                      <div>
+                        <label htmlFor="auction-city" className={labelClass}>
+                          Cidade
+                        </label>
+
+                        <input
+                          id="auction-city"
+                          name="city"
+                          type="text"
+                          maxLength={120}
+                          className={inputClass}
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="auction-state" className={labelClass}>
+                          Estado
+                        </label>
+
+                        <input
+                          id="auction-state"
+                          name="state"
+                          type="text"
+                          maxLength={2}
+                          placeholder="SP"
+                          className={`${inputClass} uppercase`}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="lg:col-span-2">
+                      <label
+                        htmlFor="auction-description"
+                        className={labelClass}
+                      >
+                        Descrição
+                      </label>
+
+                      <textarea
+                        id="auction-description"
+                        name="description"
+                        rows={4}
+                        maxLength={2000}
+                        placeholder="Descreva o estado da carta e outras informações importantes."
+                        className={`${inputClass} resize-none`}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="lg:col-span-2">
-                  <label
-                    htmlFor="auction-description"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Descrição
-                  </label>
-
-                  <textarea
-                    id="auction-description"
-                    name="description"
-                    rows={4}
-                    maxLength={2000}
-                    placeholder="Descreva o estado da carta e outras informações importantes."
-                    className="w-full resize-none rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
+                <label className="mt-6 flex cursor-pointer items-center gap-3 rounded-2xl border border-blue-100 bg-blue-50/60 p-4">
+                  <input
+                    name="shipping_available"
+                    type="checkbox"
+                    className="h-5 w-5 accent-blue-600"
                   />
-                </div>
-              </div>
 
-              <label className="mt-6 flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 p-4">
-                <input
-                  name="shipping_available"
-                  type="checkbox"
-                  className="h-4 w-4 accent-violet-600"
-                />
-                <span className="text-sm font-semibold">
-                  Posso enviar esta carta
-                </span>
-              </label>
+                  <span>
+                    <span className="block text-sm font-bold text-[#071a4c]">
+                      Posso enviar esta carta
+                    </span>
 
-              <button
-                type="submit"
-                disabled={creating}
-                className="mt-6 w-full rounded-xl bg-violet-600 px-5 py-4 text-sm font-black text-white hover:bg-violet-500 disabled:opacity-50"
-              >
-                {creating ? "Publicando..." : "Publicar leilão"}
-              </button>
-            </>
-          )}
+                    <span className="mt-1 block text-xs text-slate-500">
+                      Marque esta opção caso aceite combinar o envio com o
+                      vencedor.
+                    </span>
+                  </span>
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="mt-6 w-full rounded-xl bg-blue-600 px-5 py-4 text-sm font-black text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {creating ? "Publicando..." : "Publicar leilão"}
+                </button>
+              </>
+            )}
+          </div>
         </form>
       )}
 
       {visibleAuctions.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-white/15 p-12 text-center text-zinc-400">
-          {currentTab === "all" && "Nenhum leilão disponível no momento."}
-          {currentTab === "bids" &&
-            "Você ainda não participou de nenhum leilão."}
-          {currentTab === "mine" && "Você ainda não criou nenhum leilão."}
+        <div className="mt-6 rounded-3xl border border-dashed border-blue-200 bg-white p-10 text-center shadow-sm sm:p-12">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-2xl text-blue-600">
+            ◇
+          </div>
+
+          <h3 className="mt-5 text-xl font-black text-[#071a4c]">
+            Nenhum leilão encontrado
+          </h3>
+
+          <p className="mt-2 text-slate-600">
+            {currentTab === "all" && "Nenhum leilão disponível no momento."}
+            {currentTab === "bids" &&
+              "Você ainda não participou de nenhum leilão."}
+            {currentTab === "mine" && "Você ainda não criou nenhum leilão."}
+          </p>
         </div>
       ) : (
-        <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-6 xl:grid-cols-3">
           {visibleAuctions.map((auction) => {
             const cancelling = cancellingId === auction.auction_id;
 
             return (
               <article
                 key={auction.auction_id}
-                className="overflow-hidden rounded-2xl border border-white/10 bg-[#13131d]"
+                className="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg sm:rounded-3xl"
               >
-                <div className="aspect-[4/3] bg-black/30">
+                <div className="flex aspect-[2.5/3.5] items-center justify-center overflow-hidden border-b border-blue-100 bg-gradient-to-br from-blue-50 to-slate-50 p-2 sm:p-5">
                   {auction.front_image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={auction.front_image_url}
                       alt={auction.card_name}
-                      className="h-full w-full object-contain p-4"
+                      className="h-full w-full rounded-lg object-contain drop-shadow-lg transition duration-300 hover:scale-[1.02]"
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center text-sm text-zinc-600">
+                    <div className="flex h-full w-full items-center justify-center px-3 text-center text-xs text-slate-400 sm:text-sm">
                       Imagem não disponível
                     </div>
                   )}
                 </div>
 
-                <div className="p-5">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <span className="rounded-full bg-violet-500/15 px-3 py-1 text-xs font-bold text-violet-200">
+                <div className="p-3 sm:p-5">
+                  <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800 sm:px-3 sm:text-xs">
                       Leilão
                     </span>
 
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold ${
+                      className={`rounded-full border px-2.5 py-1 text-[10px] font-bold sm:px-3 sm:text-xs ${
                         statusStyles[auction.auction_status] ||
                         statusStyles.draft
                       }`}
@@ -617,34 +672,36 @@ export function AuctionsManager({
                     </span>
                   </div>
 
-                  <h3 className="mt-4 break-words text-xl font-black">
+                  <h3 className="mt-3 break-words text-sm font-black leading-tight text-[#071a4c] sm:mt-4 sm:text-xl">
                     {auction.title}
                   </h3>
 
-                  <p className="mt-2 font-semibold">{auction.card_name}</p>
+                  <p className="mt-2 text-xs font-bold text-slate-800 sm:text-base">
+                    {auction.card_name}
+                  </p>
 
-                  <p className="mt-1 text-sm text-zinc-500">
+                  <p className="mt-1 line-clamp-2 text-[11px] text-slate-500 sm:text-sm">
                     {auction.set_name || "Coleção não informada"}
                     {auction.card_number ? ` · ${auction.card_number}` : ""}
                   </p>
 
-                  <div className="mt-5 rounded-xl bg-violet-500/10 p-4">
-                    <p className="text-xs font-bold uppercase tracking-wider text-violet-300">
+                  <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-3 sm:mt-5 sm:p-4">
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-blue-600 sm:text-xs">
                       {auction.bid_count > 0 ? "Maior lance" : "Lance inicial"}
                     </p>
 
-                    <p className="mt-1 text-2xl font-black text-white">
+                    <p className="mt-1 break-words text-lg font-black text-blue-700 sm:text-2xl">
                       {formatCurrency(auction.current_price)}
                     </p>
 
-                    <p className="mt-2 text-xs text-zinc-400">
+                    <p className="mt-1 text-[10px] text-slate-500 sm:mt-2 sm:text-xs">
                       {auction.bid_count}{" "}
                       {auction.bid_count === 1 ? "lance" : "lances"}
                     </p>
                   </div>
 
-                  <div className="mt-5 flex items-center justify-between gap-4 text-sm">
-                    <span className="font-semibold text-yellow-200">
+                  <div className="mt-4 flex flex-col items-start gap-2 sm:mt-5 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-[11px] font-bold text-amber-700 sm:text-sm">
                       {getTimeDescription(
                         auction.ends_at,
                         auction.auction_status,
@@ -652,19 +709,19 @@ export function AuctionsManager({
                     </span>
 
                     {auction.is_highest_bidder && (
-                      <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-200">
+                      <span className="rounded-full bg-emerald-100 px-2 py-1 text-[9px] font-bold text-emerald-700 sm:px-3 sm:text-xs">
                         Você está vencendo
                       </span>
                     )}
                   </div>
 
-                  <p className="mt-3 text-xs text-zinc-500">
+                  <p className="mt-3 text-[10px] text-slate-400 sm:text-xs">
                     Encerra em {formatDate(auction.ends_at)}
                   </p>
 
                   <Link
                     href={`/auctions/${auction.auction_id}`}
-                    className="mt-5 block w-full rounded-xl bg-violet-600 px-5 py-3 text-center text-sm font-bold text-white hover:bg-violet-500"
+                    className="mt-4 block w-full rounded-xl bg-blue-600 px-2 py-3 text-center text-xs font-bold text-white transition hover:bg-blue-700 sm:mt-5 sm:px-5 sm:text-sm"
                   >
                     Ver leilão
                   </Link>
@@ -676,7 +733,7 @@ export function AuctionsManager({
                         type="button"
                         disabled={cancelling}
                         onClick={() => handleCancelAuction(auction)}
-                        className="mt-3 w-full rounded-xl border border-red-500/30 px-5 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                        className="mt-2 w-full rounded-xl border border-red-200 bg-white px-2 py-3 text-xs font-bold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 sm:mt-3 sm:px-5 sm:text-sm"
                       >
                         {cancelling ? "Cancelando..." : "Cancelar leilão"}
                       </button>

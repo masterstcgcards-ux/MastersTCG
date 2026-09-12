@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -116,45 +117,39 @@ async function BracketContent({ params }: BracketPageProps) {
 
   return (
     <>
-      <header className="border-b border-white/10 bg-[#0d0d16]">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-6 py-5">
-          <Link
-            href="/"
-            aria-label="MastersTCG — início"
-            className="text-2xl font-black tracking-tight"
-          >
-            MASTERS<span className="text-violet-400">TCG</span>
+      <header className="border-b border-blue-100 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-5 py-4 sm:px-6">
+          <Link href="/" aria-label="MastersTCG — início">
+            <Image
+              src="/masters-logo.png"
+              alt="MastersTCG"
+              width={260}
+              height={70}
+              priority
+              className="h-auto w-44 sm:w-52"
+            />
           </Link>
 
           <nav
             aria-label="Navegação da chave"
-            className="flex flex-wrap items-center gap-4 text-sm"
+            className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold text-slate-600"
           >
-            <Link
-              href="/collection"
-              className="text-zinc-400 transition hover:text-white"
-            >
+            <Link href="/collection" className="transition hover:text-blue-700">
               Minha coleção
             </Link>
 
-            <Link
-              href="/decks"
-              className="text-zinc-400 transition hover:text-white"
-            >
+            <Link href="/decks" className="transition hover:text-blue-700">
               Meus decks
             </Link>
 
-            <Link
-              href="/arena"
-              className="font-semibold text-violet-300 transition hover:text-violet-200"
-            >
+            <Link href="/arena" className="font-bold text-blue-700">
               Arena
             </Link>
 
             {isAdmin && (
               <Link
                 href={`/arena/${tournament.id}/registrations`}
-                className="text-zinc-400 transition hover:text-white"
+                className="transition hover:text-blue-700"
               >
                 Inscrições
               </Link>
@@ -163,67 +158,82 @@ async function BracketContent({ params }: BracketPageProps) {
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 py-10">
+      <section className="mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-14">
         <Link
           href="/arena"
-          className="text-sm font-semibold text-violet-300 hover:text-violet-200"
+          className="inline-flex rounded-xl border border-blue-100 bg-white px-4 py-2.5 text-sm font-bold text-blue-700 shadow-sm transition hover:bg-blue-50"
         >
           ← Voltar para a Arena
         </Link>
 
-        <div className="mt-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-400">
-            Arena Masters
-          </p>
+        <div className="relative mt-7 overflow-hidden rounded-3xl bg-gradient-to-br from-[#071a4c] via-blue-800 to-blue-600 px-6 py-10 text-white shadow-lg sm:px-10 sm:py-12">
+          <div
+            aria-hidden="true"
+            className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-yellow-400/25 blur-3xl"
+          />
 
-          <h1 className="mt-3 text-3xl font-black sm:text-4xl">
-            Chave do torneio
-          </h1>
+          <div
+            aria-hidden="true"
+            className="absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-blue-300/20 blur-3xl"
+          />
 
-          <p className="mt-3 text-xl font-bold text-zinc-200">
-            {tournament.name}
-          </p>
-
-          <div className="mt-5 flex flex-wrap gap-3 text-sm text-zinc-400">
-            <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2">
-              Pokémon TCG
+          <div className="relative">
+            <span className="inline-flex rounded-full border border-yellow-300/40 bg-yellow-300/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-yellow-300">
+              Arena Masters
             </span>
 
-            <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2">
-              Formato: {tournament.format || "Não informado"}
-            </span>
+            <h1 className="mt-5 text-3xl font-black sm:text-5xl">
+              Chave do torneio
+            </h1>
 
-            <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2">
-              Início: {formatDate(tournament.starts_at)}
-            </span>
+            <p className="mt-3 break-words text-xl font-bold text-white">
+              {tournament.name}
+            </p>
 
-            {tournament.max_players && (
-              <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2">
-                Até {tournament.max_players} participantes
+            <div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold text-blue-50">
+              <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">
+                Pokémon TCG
               </span>
-            )}
+
+              <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">
+                Formato: {tournament.format || "Não informado"}
+              </span>
+
+              <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">
+                Início: {formatDate(tournament.starts_at)}
+              </span>
+
+              {tournament.max_players && (
+                <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">
+                  Até {tournament.max_players} participantes
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
         {bracketError ? (
           <div
             role="alert"
-            className="mt-8 rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-red-200"
+            className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700"
           >
-            Não foi possível carregar a chave: {bracketError.message}
+            <p className="font-bold">Não foi possível carregar a chave.</p>
+            <p className="mt-2 text-sm">{bracketError.message}</p>
           </div>
         ) : (
-          <TournamentBracket
-            tournamentId={tournament.id}
-            initialTournamentStatus={tournament.status}
-            initialMatches={
-              Array.isArray(bracketData)
-                ? (bracketData as TournamentBracketMatch[])
-                : []
-            }
-            confirmedRegistrationsCount={confirmedRegistrationsCount}
-            isAdmin={isAdmin}
-          />
+          <div className="mt-8">
+            <TournamentBracket
+              tournamentId={tournament.id}
+              initialTournamentStatus={tournament.status}
+              initialMatches={
+                Array.isArray(bracketData)
+                  ? (bracketData as TournamentBracketMatch[])
+                  : []
+              }
+              confirmedRegistrationsCount={confirmedRegistrationsCount}
+              isAdmin={isAdmin}
+            />
+          </div>
         )}
       </section>
     </>
@@ -232,15 +242,21 @@ async function BracketContent({ params }: BracketPageProps) {
 
 function BracketLoading() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#09090f] text-white">
-      <p className="text-zinc-400">Carregando chave do torneio...</p>
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-blue-50/70 to-slate-50">
+      <div className="rounded-2xl border border-blue-100 bg-white px-8 py-6 text-center shadow-sm">
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
+
+        <p className="mt-4 font-semibold text-slate-600">
+          Carregando chave do torneio...
+        </p>
+      </div>
     </main>
   );
 }
 
 export default function BracketPage({ params }: BracketPageProps) {
   return (
-    <main className="min-h-screen bg-[#09090f] text-white">
+    <main className="min-h-screen bg-gradient-to-b from-blue-50/70 to-slate-50 text-[#071a4c]">
       <Suspense fallback={<BracketLoading />}>
         <BracketContent params={params} />
       </Suspense>

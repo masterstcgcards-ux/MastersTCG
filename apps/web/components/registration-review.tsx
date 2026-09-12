@@ -39,10 +39,10 @@ const statusLabels: Record<string, string> = {
 };
 
 const statusStyles: Record<string, string> = {
-  pending: "bg-amber-500/15 text-amber-300",
-  confirmed: "bg-green-500/15 text-green-300",
-  rejected: "bg-red-500/15 text-red-300",
-  cancelled: "bg-zinc-500/15 text-zinc-300",
+  pending: "border-amber-200 bg-amber-50 text-amber-800",
+  confirmed: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  rejected: "border-red-200 bg-red-50 text-red-700",
+  cancelled: "border-slate-200 bg-slate-50 text-slate-600",
 };
 
 const formatLabels: Record<string, string> = {
@@ -163,21 +163,30 @@ export function RegistrationReview({
   return (
     <div>
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-white/10 bg-[#11111b] p-5">
-          <p className="text-sm text-zinc-400">Total de inscrições</p>
-          <p className="mt-2 text-3xl font-black">{registrations.length}</p>
+        <div className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+          <p className="text-sm font-semibold text-slate-500">
+            Total de inscrições
+          </p>
+
+          <p className="mt-2 text-3xl font-black text-[#071a4c]">
+            {registrations.length}
+          </p>
         </div>
 
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
-          <p className="text-sm text-amber-200">Pendentes de revisão</p>
-          <p className="mt-2 text-3xl font-black text-amber-300">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+          <p className="text-sm font-semibold text-amber-800">
+            Pendentes de revisão
+          </p>
+
+          <p className="mt-2 text-3xl font-black text-amber-700">
             {pendingCount}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-green-500/20 bg-green-500/5 p-5">
-          <p className="text-sm text-green-200">Confirmadas</p>
-          <p className="mt-2 text-3xl font-black text-green-300">
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
+          <p className="text-sm font-semibold text-emerald-700">Confirmadas</p>
+
+          <p className="mt-2 text-3xl font-black text-emerald-700">
             {confirmedCount}
           </p>
         </div>
@@ -186,7 +195,7 @@ export function RegistrationReview({
       {message && (
         <div
           role="status"
-          className="mt-6 rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-green-200"
+          className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-700"
         >
           {message}
         </div>
@@ -195,17 +204,23 @@ export function RegistrationReview({
       {error && (
         <div
           role="alert"
-          className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200"
+          className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 font-semibold text-red-700"
         >
           {error}
         </div>
       )}
 
       {registrations.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-white/15 p-10 text-center">
-          <h2 className="text-xl font-bold">Nenhuma inscrição recebida</h2>
+        <div className="mt-8 rounded-3xl border border-dashed border-blue-200 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-2xl text-blue-600">
+            ◇
+          </div>
 
-          <p className="mt-2 text-zinc-400">
+          <h2 className="mt-5 text-xl font-black text-[#071a4c]">
+            Nenhuma inscrição recebida
+          </h2>
+
+          <p className="mt-2 text-slate-600">
             As inscrições aparecerão aqui quando os jogadores enviarem seus
             decks.
           </p>
@@ -219,145 +234,162 @@ export function RegistrationReview({
             return (
               <article
                 key={registration.registration_id}
-                className="rounded-2xl border border-white/10 bg-[#11111b] p-6"
+                className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm"
               >
-                <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-400">
-                      Jogador
-                    </p>
-
-                    <h2 className="mt-2 break-words text-2xl font-black">
-                      {registration.player_name}
-                    </h2>
-
-                    {registration.player_username && (
-                      <p className="mt-1 text-sm text-zinc-500">
-                        @{registration.player_username}
+                <div className="border-b border-blue-100 bg-gradient-to-r from-blue-50 to-white p-5 sm:p-6">
+                  <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">
+                        Jogador
                       </p>
-                    )}
 
-                    <p className="mt-3 text-sm text-zinc-400">
-                      Inscrição enviada em{" "}
-                      {formatDate(registration.registered_at)}
-                    </p>
-                  </div>
+                      <h2 className="mt-2 break-words text-2xl font-black text-[#071a4c]">
+                        {registration.player_name}
+                      </h2>
 
-                  <span
-                    className={`w-fit rounded-full px-4 py-2 text-xs font-bold ${
-                      statusStyles[registration.registration_status] ||
-                      statusStyles.pending
-                    }`}
-                  >
-                    {statusLabels[registration.registration_status] ||
-                      registration.registration_status}
-                  </span>
-                </div>
+                      {registration.player_username && (
+                        <p className="mt-1 text-sm font-semibold text-blue-600">
+                          @{registration.player_username}
+                        </p>
+                      )}
 
-                <div className="mt-6 grid gap-4 rounded-xl border border-white/10 bg-black/20 p-5 sm:grid-cols-3">
-                  <div>
-                    <p className="text-xs text-zinc-500">Deck</p>
-                    <p className="mt-1 break-words font-bold">
-                      {registration.deck_name}
-                    </p>
-                  </div>
+                      <p className="mt-3 text-sm text-slate-500">
+                        Inscrição enviada em{" "}
+                        {formatDate(registration.registered_at)}
+                      </p>
+                    </div>
 
-                  <div>
-                    <p className="text-xs text-zinc-500">Formato</p>
-                    <p className="mt-1 font-bold">
-                      {registration.deck_format
-                        ? formatLabels[registration.deck_format] ||
-                          registration.deck_format
-                        : "Não informado"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-zinc-500">Total de cartas</p>
-                    <p className="mt-1 font-bold">{registration.card_count}</p>
+                    <span
+                      className={`w-fit rounded-full border px-4 py-2 text-xs font-bold ${
+                        statusStyles[registration.registration_status] ||
+                        statusStyles.pending
+                      }`}
+                    >
+                      {statusLabels[registration.registration_status] ||
+                        registration.registration_status}
+                    </span>
                   </div>
                 </div>
 
-                <details className="mt-5 rounded-xl border border-white/10 p-5">
-                  <summary className="cursor-pointer font-bold">
-                    Ver lista enviada ({cards.length} registros)
-                  </summary>
+                <div className="p-5 sm:p-6">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div className="col-span-2 rounded-xl bg-slate-50 p-4 sm:col-span-1">
+                      <p className="text-xs font-semibold text-slate-500">
+                        Deck
+                      </p>
 
-                  {cards.length === 0 ? (
-                    <p className="mt-4 text-sm text-red-300">
-                      A lista enviada está vazia ou não pôde ser interpretada.
-                    </p>
-                  ) : (
-                    <div className="mt-4 divide-y divide-white/10">
-                      {cards.map((card, index) => (
-                        <div
-                          key={
-                            card.user_card_id || `${card.card_name}-${index}`
-                          }
-                          className="flex flex-col justify-between gap-2 py-3 sm:flex-row sm:items-center"
-                        >
-                          <div>
-                            <p className="font-semibold">
-                              {card.card_name || "Carta sem nome"}
-                            </p>
+                      <p className="mt-1 break-words font-bold text-[#071a4c]">
+                        {registration.deck_name}
+                      </p>
+                    </div>
 
-                            <p className="mt-1 text-xs text-zinc-500">
-                              {card.set_name || "Coleção não informada"}
-                              {card.card_number ? ` • ${card.card_number}` : ""}
-                              {card.language ? ` • ${card.language}` : ""}
-                            </p>
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-xs font-semibold text-slate-500">
+                        Formato
+                      </p>
+
+                      <p className="mt-1 font-bold text-[#071a4c]">
+                        {registration.deck_format
+                          ? formatLabels[registration.deck_format] ||
+                            registration.deck_format
+                          : "Não informado"}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-blue-50 p-4">
+                      <p className="text-xs font-semibold text-blue-600">
+                        Total de cartas
+                      </p>
+
+                      <p className="mt-1 font-black text-blue-700">
+                        {registration.card_count}
+                      </p>
+                    </div>
+                  </div>
+
+                  <details className="mt-5 overflow-hidden rounded-2xl border border-blue-100">
+                    <summary className="cursor-pointer bg-blue-50 px-5 py-4 font-bold text-blue-700">
+                      Ver lista enviada ({cards.length} registros)
+                    </summary>
+
+                    {cards.length === 0 ? (
+                      <p className="border-t border-blue-100 p-5 text-sm font-semibold text-red-600">
+                        A lista enviada está vazia ou não pôde ser interpretada.
+                      </p>
+                    ) : (
+                      <div className="divide-y divide-blue-100 border-t border-blue-100 px-5">
+                        {cards.map((card, index) => (
+                          <div
+                            key={
+                              card.user_card_id || `${card.card_name}-${index}`
+                            }
+                            className="flex flex-col justify-between gap-3 py-4 sm:flex-row sm:items-center"
+                          >
+                            <div>
+                              <p className="font-bold text-[#071a4c]">
+                                {card.card_name || "Carta sem nome"}
+                              </p>
+
+                              <p className="mt-1 text-xs text-slate-500">
+                                {card.set_name || "Coleção não informada"}
+                                {card.card_number
+                                  ? ` • ${card.card_number}`
+                                  : ""}
+                                {card.language ? ` • ${card.language}` : ""}
+                              </p>
+                            </div>
+
+                            <span className="w-fit rounded-lg bg-blue-100 px-3 py-1 text-sm font-black text-blue-700">
+                              {Number(card.quantity || 0)}x
+                            </span>
                           </div>
+                        ))}
+                      </div>
+                    )}
+                  </details>
 
-                          <span className="w-fit rounded-lg bg-violet-500/10 px-3 py-1 text-sm font-bold text-violet-300">
-                            {Number(card.quantity || 0)}x
-                          </span>
-                        </div>
-                      ))}
+                  {registration.registration_status !== "cancelled" && (
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        disabled={
+                          updating ||
+                          Boolean(updatingId) ||
+                          registration.registration_status === "confirmed"
+                        }
+                        onClick={() =>
+                          reviewRegistration(registration, "confirmed")
+                        }
+                        className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {updating
+                          ? "Atualizando..."
+                          : registration.registration_status === "confirmed"
+                            ? "Inscrição confirmada"
+                            : "Confirmar inscrição"}
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={
+                          updating ||
+                          Boolean(updatingId) ||
+                          registration.registration_status === "rejected"
+                        }
+                        onClick={() =>
+                          reviewRegistration(registration, "rejected")
+                        }
+                        className="rounded-xl border border-red-200 bg-white px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {updating
+                          ? "Atualizando..."
+                          : registration.registration_status === "rejected"
+                            ? "Inscrição não aprovada"
+                            : "Não aprovar"}
+                      </button>
                     </div>
                   )}
-                </details>
-
-                {registration.registration_status !== "cancelled" && (
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      disabled={
-                        updating ||
-                        Boolean(updatingId) ||
-                        registration.registration_status === "confirmed"
-                      }
-                      onClick={() =>
-                        reviewRegistration(registration, "confirmed")
-                      }
-                      className="rounded-xl bg-green-600 px-5 py-3 text-sm font-bold text-white hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      {updating
-                        ? "Atualizando..."
-                        : registration.registration_status === "confirmed"
-                          ? "Inscrição confirmada"
-                          : "Confirmar inscrição"}
-                    </button>
-
-                    <button
-                      type="button"
-                      disabled={
-                        updating ||
-                        Boolean(updatingId) ||
-                        registration.registration_status === "rejected"
-                      }
-                      onClick={() =>
-                        reviewRegistration(registration, "rejected")
-                      }
-                      className="rounded-xl border border-red-500/30 px-5 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      {updating
-                        ? "Atualizando..."
-                        : registration.registration_status === "rejected"
-                          ? "Inscrição não aprovada"
-                          : "Não aprovar"}
-                    </button>
-                  </div>
-                )}
+                </div>
               </article>
             );
           })}

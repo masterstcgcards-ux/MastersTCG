@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useMemo, useRef, useState } from "react";
+
 import { ReportForm } from "@/components/report-form";
 import { ReviewForm } from "@/components/review-form";
 import { createClient } from "@/lib/supabase/client";
@@ -56,11 +57,11 @@ const statusLabels: Record<string, string> = {
 };
 
 const statusStyles: Record<string, string> = {
-  pending: "bg-yellow-500/15 text-yellow-200",
-  confirmed: "bg-blue-500/15 text-blue-200",
-  shipped: "bg-violet-500/15 text-violet-200",
-  completed: "bg-emerald-500/15 text-emerald-200",
-  cancelled: "bg-red-500/15 text-red-200",
+  pending: "border-amber-200 bg-amber-50 text-amber-800",
+  confirmed: "border-blue-200 bg-blue-50 text-blue-700",
+  shipped: "border-indigo-200 bg-indigo-50 text-indigo-700",
+  completed: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  cancelled: "border-red-200 bg-red-50 text-red-700",
 };
 
 const deliveryLabels: Record<string, string> = {
@@ -191,23 +192,30 @@ export function OrdersManager({
 
   return (
     <div>
-      <section className="rounded-2xl border border-white/10 bg-[#13131d] p-6">
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+      <section className="rounded-3xl border border-blue-100 bg-white p-5 shadow-sm sm:p-7">
+        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div>
-            <h2 className="text-2xl font-black">Central de pedidos</h2>
-            <p className="mt-2 text-sm text-zinc-400">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-blue-600">
+              Área de negociações
+            </p>
+
+            <h2 className="mt-2 text-2xl font-black text-[#071a4c]">
+              Central de pedidos
+            </h2>
+
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
               Acompanhe suas compras e administre suas vendas.
             </p>
           </div>
 
-          <div className="flex rounded-xl border border-white/10 bg-black/20 p-1">
+          <div className="grid grid-cols-2 rounded-2xl border border-blue-100 bg-blue-50 p-1">
             <button
               type="button"
               onClick={() => changeTab("purchases")}
-              className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
+              className={`rounded-xl px-4 py-3 text-sm font-bold transition ${
                 currentTab === "purchases"
-                  ? "bg-violet-600 text-white"
-                  : "text-zinc-400 hover:text-white"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "text-slate-600 hover:bg-white hover:text-blue-700"
               }`}
             >
               Minhas compras
@@ -216,10 +224,10 @@ export function OrdersManager({
             <button
               type="button"
               onClick={() => changeTab("sales")}
-              className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
+              className={`rounded-xl px-4 py-3 text-sm font-bold transition ${
                 currentTab === "sales"
-                  ? "bg-violet-600 text-white"
-                  : "text-zinc-400 hover:text-white"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "text-slate-600 hover:bg-white hover:text-blue-700"
               }`}
             >
               Minhas vendas
@@ -227,10 +235,10 @@ export function OrdersManager({
           </div>
         </div>
 
-        <div className="mt-6 max-w-sm">
+        <div className="mt-7 max-w-sm">
           <label
             htmlFor="status-filter"
-            className="mb-2 block text-sm font-semibold"
+            className="mb-2 block text-sm font-bold text-[#071a4c]"
           >
             Filtrar por situação
           </label>
@@ -239,7 +247,7 @@ export function OrdersManager({
             id="status-filter"
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-[#0d0d16] px-4 py-3 outline-none focus:border-violet-500"
+            className="w-full rounded-xl border border-blue-100 bg-white px-4 py-3 text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
           >
             <option value="all">Todos</option>
             <option value="pending">Aguardando vendedor</option>
@@ -254,7 +262,7 @@ export function OrdersManager({
       {message && (
         <div
           role="status"
-          className="mt-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-200"
+          className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-700"
         >
           {message}
         </div>
@@ -263,15 +271,23 @@ export function OrdersManager({
       {error && (
         <div
           role="alert"
-          className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200"
+          className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 font-semibold text-red-700"
         >
           {error}
         </div>
       )}
 
       {filteredOrders.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-white/15 p-12 text-center">
-          <p className="text-zinc-400">
+        <div className="mt-6 rounded-3xl border border-dashed border-blue-200 bg-white p-10 text-center shadow-sm sm:p-12">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-2xl text-blue-600">
+            ◇
+          </div>
+
+          <h3 className="mt-5 text-xl font-black text-[#071a4c]">
+            Nenhum pedido encontrado
+          </h3>
+
+          <p className="mt-2 text-slate-600">
             {currentTab === "purchases"
               ? "Você não possui compras neste filtro."
               : "Você não possui vendas neste filtro."}
@@ -280,7 +296,7 @@ export function OrdersManager({
           {currentTab === "purchases" && (
             <Link
               href="/marketplace"
-              className="mt-5 inline-flex rounded-xl bg-violet-600 px-5 py-3 text-sm font-bold text-white hover:bg-violet-500"
+              className="mt-6 inline-flex rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
             >
               Explorar Marketplace
             </Link>
@@ -290,6 +306,7 @@ export function OrdersManager({
         <div className="mt-6 grid gap-6">
           {filteredOrders.map((order) => {
             const updating = updatingOrderId === order.order_id;
+
             const counterpartName =
               currentTab === "purchases"
                 ? order.seller_display_name ||
@@ -302,77 +319,90 @@ export function OrdersManager({
             return (
               <article
                 key={order.order_id}
-                className="overflow-hidden rounded-2xl border border-white/10 bg-[#13131d]"
+                className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                <div className="grid md:grid-cols-[220px_minmax(0,1fr)]">
-                  <div className="min-h-64 bg-black/30">
+                <div className="grid md:grid-cols-[230px_minmax(0,1fr)]">
+                  <div className="flex min-h-72 items-center justify-center border-b border-blue-100 bg-gradient-to-br from-blue-50 to-slate-50 p-5 md:border-b-0 md:border-r">
                     {order.front_image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={order.front_image_url}
                         alt={order.card_name}
-                        className="h-full w-full object-contain p-5"
+                        className="aspect-[2.5/3.5] max-h-72 w-auto max-w-full rounded-xl object-contain drop-shadow-lg"
                       />
                     ) : (
-                      <div className="flex h-full min-h-64 items-center justify-center text-sm text-zinc-600">
+                      <div className="flex aspect-[2.5/3.5] h-64 items-center justify-center rounded-2xl border border-dashed border-blue-200 bg-white px-5 text-center text-sm text-slate-400">
                         Imagem não disponível
                       </div>
                     )}
                   </div>
 
-                  <div className="min-w-0 p-6">
+                  <div className="min-w-0 p-5 sm:p-7">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="min-w-0">
-                        <p className="text-xs font-bold uppercase tracking-widest text-violet-400">
+                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
                           {currentTab === "purchases"
                             ? `Vendido por ${counterpartName}`
                             : `Comprado por ${counterpartName}`}
                         </p>
 
-                        <h3 className="mt-2 break-words text-2xl font-black">
+                        <h3 className="mt-2 break-words text-2xl font-black text-[#071a4c]">
                           {order.listing_title}
                         </h3>
 
-                        <p className="mt-2 font-semibold">{order.card_name}</p>
+                        <p className="mt-2 font-bold text-slate-800">
+                          {order.card_name}
+                        </p>
 
-                        <p className="mt-1 text-sm text-zinc-500">
+                        <p className="mt-1 text-sm text-slate-500">
                           {order.set_name || "Coleção não informada"}
                           {order.card_number ? ` · ${order.card_number}` : ""}
                         </p>
                       </div>
 
                       <span
-                        className={`rounded-full px-3 py-1 text-xs font-bold ${
+                        className={`rounded-full border px-3 py-1.5 text-xs font-bold ${
                           statusStyles[order.order_status] ||
-                          "bg-white/10 text-zinc-300"
+                          "border-slate-200 bg-slate-50 text-slate-600"
                         }`}
                       >
                         {statusLabels[order.order_status] || order.order_status}
                       </span>
                     </div>
 
-                    <dl className="mt-6 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                      <div>
-                        <dt className="text-zinc-500">Quantidade</dt>
-                        <dd className="mt-1 font-semibold">{order.quantity}</dd>
+                    <dl className="mt-6 grid grid-cols-2 gap-3 text-sm lg:grid-cols-4">
+                      <div className="rounded-xl bg-slate-50 p-3">
+                        <dt className="text-xs font-semibold text-slate-500">
+                          Quantidade
+                        </dt>
+                        <dd className="mt-1 font-bold text-[#071a4c]">
+                          {order.quantity}
+                        </dd>
                       </div>
 
-                      <div>
-                        <dt className="text-zinc-500">Valor unitário</dt>
-                        <dd className="mt-1 font-semibold">
+                      <div className="rounded-xl bg-slate-50 p-3">
+                        <dt className="text-xs font-semibold text-slate-500">
+                          Valor unitário
+                        </dt>
+                        <dd className="mt-1 font-bold text-[#071a4c]">
                           {formatCurrency(order.unit_price)}
                         </dd>
                       </div>
 
-                      <div>
-                        <dt className="text-zinc-500">Total</dt>
-                        <dd className="mt-1 font-bold text-emerald-400">
+                      <div className="rounded-xl bg-blue-50 p-3">
+                        <dt className="text-xs font-semibold text-blue-600">
+                          Total
+                        </dt>
+                        <dd className="mt-1 font-black text-blue-700">
                           {formatCurrency(order.total_amount)}
                         </dd>
                       </div>
 
-                      <div>
-                        <dt className="text-zinc-500">Entrega</dt>
-                        <dd className="mt-1 font-semibold">
+                      <div className="rounded-xl bg-slate-50 p-3">
+                        <dt className="text-xs font-semibold text-slate-500">
+                          Entrega
+                        </dt>
+                        <dd className="mt-1 font-bold text-[#071a4c]">
                           {deliveryLabels[order.delivery_method] ||
                             order.delivery_method}
                         </dd>
@@ -380,41 +410,46 @@ export function OrdersManager({
                     </dl>
 
                     {order.delivery_method === "shipping" && (
-                      <details className="mt-6 rounded-xl border border-white/10 p-4">
-                        <summary className="cursor-pointer font-semibold">
+                      <details className="mt-6 overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/50">
+                        <summary className="cursor-pointer px-4 py-4 font-bold text-blue-700">
                           Ver endereço de entrega
                         </summary>
 
-                        <div className="mt-4 space-y-1 text-sm text-zinc-300">
-                          <p className="font-semibold">
+                        <div className="border-t border-blue-100 bg-white px-4 py-4 text-sm leading-relaxed text-slate-600">
+                          <p className="font-bold text-[#071a4c]">
                             {order.recipient_name}
                           </p>
-                          <p>
+
+                          <p className="mt-1">
                             {order.address_line}, {order.address_number}
                             {order.address_complement
                               ? ` — ${order.address_complement}`
                               : ""}
                           </p>
+
                           <p>
                             {[order.neighborhood, order.city, order.state]
                               .filter(Boolean)
                               .join(" — ")}
                           </p>
+
                           <p>CEP: {order.postal_code}</p>
                         </div>
                       </details>
                     )}
 
                     {order.buyer_notes && (
-                      <div className="mt-5 rounded-xl bg-white/5 p-4">
-                        <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+                      <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
                           Mensagem do comprador
                         </p>
-                        <p className="mt-2 whitespace-pre-wrap break-words text-sm text-zinc-300">
+
+                        <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-700">
                           {order.buyer_notes}
                         </p>
                       </div>
                     )}
+
                     {order.order_status === "completed" &&
                       !order.has_reviewed && (
                         <ReviewForm
@@ -425,7 +460,7 @@ export function OrdersManager({
 
                     {order.order_status === "completed" &&
                       order.has_reviewed && (
-                        <div className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm text-emerald-200">
+                        <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
                           Você já avaliou esta negociação.
                         </div>
                       )}
@@ -435,7 +470,8 @@ export function OrdersManager({
                       targetId={order.order_id}
                       targetLabel="negociação"
                     />
-                    <p className="mt-5 text-xs text-zinc-600">
+
+                    <p className="mt-5 text-xs font-medium text-slate-400">
                       Pedido criado em {formatDate(order.created_at)}
                     </p>
 
@@ -447,7 +483,7 @@ export function OrdersManager({
                               type="button"
                               disabled={updating}
                               onClick={() => updateStatus(order, "confirmed")}
-                              className="rounded-xl bg-violet-600 px-5 py-3 text-sm font-bold text-white hover:bg-violet-500 disabled:opacity-50"
+                              className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               {updating ? "Atualizando..." : "Confirmar pedido"}
                             </button>
@@ -456,7 +492,7 @@ export function OrdersManager({
                               type="button"
                               disabled={updating}
                               onClick={() => updateStatus(order, "cancelled")}
-                              className="rounded-xl border border-red-500/30 px-5 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                              className="rounded-xl border border-red-200 bg-white px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               Cancelar pedido
                             </button>
@@ -471,7 +507,7 @@ export function OrdersManager({
                                 type="button"
                                 disabled={updating}
                                 onClick={() => updateStatus(order, "shipped")}
-                                className="rounded-xl bg-violet-600 px-5 py-3 text-sm font-bold text-white hover:bg-violet-500 disabled:opacity-50"
+                                className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 {updating
                                   ? "Atualizando..."
@@ -483,7 +519,7 @@ export function OrdersManager({
                               type="button"
                               disabled={updating}
                               onClick={() => updateStatus(order, "cancelled")}
-                              className="rounded-xl border border-red-500/30 px-5 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                              className="rounded-xl border border-red-200 bg-white px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               Cancelar pedido
                             </button>
@@ -496,7 +532,7 @@ export function OrdersManager({
                             type="button"
                             disabled={updating}
                             onClick={() => updateStatus(order, "cancelled")}
-                            className="rounded-xl border border-red-500/30 px-5 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                            className="rounded-xl border border-red-200 bg-white px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {updating ? "Cancelando..." : "Cancelar compra"}
                           </button>
@@ -509,7 +545,7 @@ export function OrdersManager({
                             type="button"
                             disabled={updating}
                             onClick={() => updateStatus(order, "completed")}
-                            className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-500 disabled:opacity-50"
+                            className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {updating
                               ? "Concluindo..."
@@ -523,7 +559,7 @@ export function OrdersManager({
                             type="button"
                             disabled={updating}
                             onClick={() => updateStatus(order, "completed")}
-                            className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-500 disabled:opacity-50"
+                            className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {updating
                               ? "Concluindo..."
@@ -539,8 +575,9 @@ export function OrdersManager({
         </div>
       )}
 
-      <div className="mt-8 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-5 text-sm leading-6 text-yellow-100">
-        O MastersTCG registra e acompanha o pedido, mas não processa pagamentos
+      <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
+        <strong className="font-black">Negocie com segurança.</strong> O
+        MastersTCG registra e acompanha o pedido, mas não processa pagamentos
         nesta etapa. Confira a carta e combine pagamento e entrega com
         segurança.
       </div>

@@ -1,13 +1,11 @@
 "use client";
+
 import Link from "next/link";
-
-import { useRef, useState } from "react";
-import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
-
-import { createClient } from "@/lib/supabase/client";
+import { useRef, useState, type FormEvent } from "react";
 
 import { TournamentRegistration } from "@/components/tournament-registration";
+import { createClient } from "@/lib/supabase/client";
 
 export type Tournament = {
   id: string;
@@ -45,11 +43,11 @@ const formatLabels: Record<string, string> = {
 };
 
 const statusStyles: Record<string, string> = {
-  draft: "bg-zinc-500/15 text-zinc-300",
-  published: "bg-violet-500/15 text-violet-300",
-  in_progress: "bg-green-500/15 text-green-300",
-  completed: "bg-blue-500/15 text-blue-300",
-  cancelled: "bg-red-500/15 text-red-300",
+  draft: "border-slate-200 bg-slate-50 text-slate-600",
+  published: "border-blue-200 bg-blue-50 text-blue-700",
+  in_progress: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  completed: "border-indigo-200 bg-indigo-50 text-indigo-700",
+  cancelled: "border-red-200 bg-red-50 text-red-700",
 };
 
 const tournamentColumns = `
@@ -67,6 +65,11 @@ const tournamentColumns = `
   prizes_description,
   created_at
 `;
+
+const fieldClass =
+  "mt-2 block w-full rounded-xl border border-blue-100 bg-white px-4 py-3 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100";
+
+const labelClass = "text-sm font-bold text-[#071a4c]";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -295,27 +298,35 @@ export function TournamentsManager({
     }
   }
 
-  const fieldClass =
-    "mt-2 block w-full rounded-xl border border-white/15 bg-[#171721] px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-violet-500";
-
   return (
     <div className="space-y-8">
       {isAdmin && (
-        <section className="rounded-2xl border border-violet-500/25 bg-[#11111b] p-6">
-          <h2 className="text-2xl font-black">Criar torneio</h2>
+        <section className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm">
+          <div className="border-b border-blue-100 bg-gradient-to-r from-blue-50 to-white p-6 sm:p-8">
+            <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-800">
+              Administração
+            </span>
 
-          <p className="mt-2 text-sm text-zinc-400">
-            Área administrativa. Todo novo torneio começa como rascunho, visível
-            apenas para administradores.
-          </p>
+            <h2 className="mt-4 text-2xl font-black text-[#071a4c]">
+              Criar torneio
+            </h2>
 
-          <form onSubmit={handleCreate} className="mt-6">
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600">
+              Todo novo torneio começa como rascunho e fica visível apenas para
+              administradores até sua publicação.
+            </p>
+          </div>
+
+          <form onSubmit={handleCreate} className="p-5 sm:p-8">
             <fieldset
               disabled={busy}
               className="grid min-w-0 gap-5 disabled:opacity-60 md:grid-cols-2"
             >
               <div className="md:col-span-2">
-                <label htmlFor="tournament-name">Nome do torneio *</label>
+                <label htmlFor="tournament-name" className={labelClass}>
+                  Nome do torneio *
+                </label>
+
                 <input
                   id="tournament-name"
                   name="name"
@@ -328,7 +339,10 @@ export function TournamentsManager({
               </div>
 
               <div>
-                <label htmlFor="tournament-format">Formato *</label>
+                <label htmlFor="tournament-format" className={labelClass}>
+                  Formato *
+                </label>
+
                 <select
                   id="tournament-format"
                   name="format"
@@ -342,9 +356,10 @@ export function TournamentsManager({
               </div>
 
               <div>
-                <label htmlFor="tournament-capacity">
+                <label htmlFor="tournament-capacity" className={labelClass}>
                   Limite de participantes *
                 </label>
+
                 <input
                   id="tournament-capacity"
                   name="max_players"
@@ -359,9 +374,10 @@ export function TournamentsManager({
               </div>
 
               <div>
-                <label htmlFor="tournament-start">
+                <label htmlFor="tournament-start" className={labelClass}>
                   Início — horário de Brasília *
                 </label>
+
                 <input
                   id="tournament-start"
                   name="starts_at"
@@ -372,9 +388,10 @@ export function TournamentsManager({
               </div>
 
               <div>
-                <label htmlFor="tournament-deadline">
+                <label htmlFor="tournament-deadline" className={labelClass}>
                   Prazo de inscrição — horário de Brasília
                 </label>
+
                 <input
                   id="tournament-deadline"
                   name="registration_deadline"
@@ -384,7 +401,10 @@ export function TournamentsManager({
               </div>
 
               <div className="md:col-span-2">
-                <label htmlFor="tournament-location">Local ou modalidade</label>
+                <label htmlFor="tournament-location" className={labelClass}>
+                  Local ou modalidade
+                </label>
+
                 <input
                   id="tournament-location"
                   name="location"
@@ -395,43 +415,52 @@ export function TournamentsManager({
               </div>
 
               <div className="md:col-span-2">
-                <label htmlFor="tournament-description">Descrição</label>
+                <label htmlFor="tournament-description" className={labelClass}>
+                  Descrição
+                </label>
+
                 <textarea
                   id="tournament-description"
                   name="description"
                   rows={3}
                   maxLength={5000}
-                  className={fieldClass}
+                  className={`${fieldClass} resize-none`}
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label htmlFor="tournament-rules">Regulamento</label>
+                <label htmlFor="tournament-rules" className={labelClass}>
+                  Regulamento
+                </label>
+
                 <textarea
                   id="tournament-rules"
                   name="rules"
                   rows={4}
                   maxLength={10000}
                   placeholder="Informe as condições de participação."
-                  className={fieldClass}
+                  className={`${fieldClass} resize-none`}
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label htmlFor="tournament-prizes">Premiação</label>
+                <label htmlFor="tournament-prizes" className={labelClass}>
+                  Premiação
+                </label>
+
                 <textarea
                   id="tournament-prizes"
                   name="prizes_description"
                   rows={2}
                   maxLength={3000}
                   placeholder="Descreva somente prêmios confirmados."
-                  className={fieldClass}
+                  className={`${fieldClass} resize-none`}
                 />
               </div>
 
               <button
                 type="submit"
-                className="rounded-xl bg-violet-600 px-6 py-3 font-bold text-white hover:bg-violet-500 disabled:cursor-not-allowed md:col-span-2"
+                className="rounded-xl bg-blue-600 px-6 py-4 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2"
               >
                 {saving ? "Salvando..." : "Criar rascunho"}
               </button>
@@ -443,7 +472,7 @@ export function TournamentsManager({
       {message && (
         <div
           role="status"
-          className="rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-green-200"
+          className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-700"
         >
           {message}
         </div>
@@ -452,26 +481,42 @@ export function TournamentsManager({
       {error && (
         <div
           role="alert"
-          className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 font-semibold text-red-700"
         >
           {error}
         </div>
       )}
 
       <section>
-        <h2 className="text-2xl font-black">
-          {isAdmin ? "Gerenciar torneios" : "Torneios"}
-        </h2>
+        <div className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-blue-600">
+            Competições
+          </p>
 
-        <p className="mt-2 text-sm text-zinc-400">
-          Confira os torneios publicados e envie seu deck para revisão.
-        </p>
+          <h2 className="mt-2 text-2xl font-black text-[#071a4c]">
+            {isAdmin ? "Gerenciar torneios" : "Torneios"}
+          </h2>
+
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+            Confira os torneios publicados e envie seu deck para revisão.
+          </p>
+        </div>
 
         {tournaments.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-white/15 p-10 text-center text-zinc-400">
-            {isAdmin
-              ? "Nenhum torneio cadastrado. Crie o primeiro rascunho acima."
-              : "Nenhum torneio publicado no momento."}
+          <div className="mt-6 rounded-3xl border border-dashed border-blue-200 bg-white p-10 text-center shadow-sm">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-2xl text-blue-600">
+              ◇
+            </div>
+
+            <h3 className="mt-5 text-xl font-black text-[#071a4c]">
+              Nenhum torneio encontrado
+            </h3>
+
+            <p className="mt-2 text-slate-600">
+              {isAdmin
+                ? "Nenhum torneio cadastrado. Crie o primeiro rascunho acima."
+                : "Nenhum torneio publicado no momento."}
+            </p>
           </div>
         ) : (
           <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -481,140 +526,173 @@ export function TournamentsManager({
               return (
                 <article
                   key={tournament.id}
-                  className="min-w-0 rounded-2xl border border-white/10 bg-[#13131d] p-6"
+                  className="min-w-0 overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="text-xs font-bold uppercase tracking-widest text-violet-400">
-                      Pokémon TCG
-                    </p>
+                  <div className="relative overflow-hidden bg-gradient-to-br from-[#071a4c] via-blue-800 to-blue-600 p-6 text-white">
+                    <div
+                      aria-hidden="true"
+                      className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-yellow-400/20 blur-3xl"
+                    />
 
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold ${
-                        statusStyles[tournament.status] || statusStyles.draft
-                      }`}
-                    >
-                      {statusLabels[tournament.status] || tournament.status}
-                    </span>
+                    <div className="relative">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-xs font-bold uppercase tracking-widest text-yellow-300">
+                          Pokémon TCG
+                        </p>
+
+                        <span
+                          className={`rounded-full border px-3 py-1 text-xs font-bold ${
+                            statusStyles[tournament.status] ||
+                            statusStyles.draft
+                          }`}
+                        >
+                          {statusLabels[tournament.status] || tournament.status}
+                        </span>
+                      </div>
+
+                      <h3 className="mt-4 break-words text-2xl font-black">
+                        {tournament.name}
+                      </h3>
+
+                      {tournament.description && (
+                        <p className="mt-3 line-clamp-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-blue-100">
+                          {tournament.description}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
-                  <h3 className="mt-4 break-words text-2xl font-black">
-                    {tournament.name}
-                  </h3>
-
-                  {tournament.description && (
-                    <p className="mt-3 whitespace-pre-wrap break-words text-sm text-zinc-400">
-                      {tournament.description}
-                    </p>
-                  )}
-
-                  <dl className="mt-5 space-y-3 text-sm">
-                    <div>
-                      <dt className="text-zinc-500">Formato</dt>
-                      <dd>
-                        {formatLabels[tournament.format] || tournament.format}
-                      </dd>
-                    </div>
-
-                    <div>
-                      <dt className="text-zinc-500">Início — Brasília</dt>
-                      <dd>{formatDate(tournament.starts_at)}</dd>
-                    </div>
-
-                    {tournament.registration_deadline && (
-                      <div>
-                        <dt className="text-zinc-500">
-                          Prazo de inscrição — Brasília
+                  <div className="p-5 sm:p-6">
+                    <dl className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="rounded-xl bg-slate-50 p-3">
+                        <dt className="text-xs font-semibold text-slate-500">
+                          Formato
                         </dt>
-                        <dd>{formatDate(tournament.registration_deadline)}</dd>
+                        <dd className="mt-1 font-bold text-[#071a4c]">
+                          {formatLabels[tournament.format] || tournament.format}
+                        </dd>
+                      </div>
+
+                      <div className="rounded-xl bg-slate-50 p-3">
+                        <dt className="text-xs font-semibold text-slate-500">
+                          Capacidade
+                        </dt>
+                        <dd className="mt-1 font-bold text-[#071a4c]">
+                          Até {tournament.max_players}
+                        </dd>
+                      </div>
+
+                      <div className="col-span-2 rounded-xl bg-blue-50 p-3">
+                        <dt className="text-xs font-semibold text-blue-600">
+                          Início — Brasília
+                        </dt>
+                        <dd className="mt-1 font-bold text-blue-800">
+                          {formatDate(tournament.starts_at)}
+                        </dd>
+                      </div>
+
+                      {tournament.registration_deadline && (
+                        <div className="col-span-2 rounded-xl bg-amber-50 p-3">
+                          <dt className="text-xs font-semibold text-amber-700">
+                            Prazo de inscrição — Brasília
+                          </dt>
+                          <dd className="mt-1 font-bold text-amber-900">
+                            {formatDate(tournament.registration_deadline)}
+                          </dd>
+                        </div>
+                      )}
+
+                      <div className="col-span-2 rounded-xl bg-slate-50 p-3">
+                        <dt className="text-xs font-semibold text-slate-500">
+                          Local
+                        </dt>
+                        <dd className="mt-1 break-words font-bold text-[#071a4c]">
+                          {tournament.location || "A confirmar"}
+                        </dd>
+                      </div>
+                    </dl>
+
+                    {tournament.prizes_description && (
+                      <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                        <h4 className="font-black text-amber-800">Premiação</h4>
+
+                        <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-amber-950">
+                          {tournament.prizes_description}
+                        </p>
                       </div>
                     )}
 
-                    <div>
-                      <dt className="text-zinc-500">Capacidade</dt>
-                      <dd>Até {tournament.max_players} participantes</dd>
-                    </div>
+                    {tournament.rules && (
+                      <details className="mt-5 overflow-hidden rounded-2xl border border-blue-100">
+                        <summary className="cursor-pointer bg-blue-50 px-4 py-3 font-bold text-blue-700">
+                          Ver regulamento
+                        </summary>
 
-                    <div>
-                      <dt className="text-zinc-500">Local</dt>
-                      <dd className="break-words">
-                        {tournament.location || "A confirmar"}
-                      </dd>
-                    </div>
-                  </dl>
+                        <p className="whitespace-pre-wrap break-words border-t border-blue-100 p-4 text-sm leading-relaxed text-slate-600">
+                          {tournament.rules}
+                        </p>
+                      </details>
+                    )}
 
-                  {tournament.prizes_description && (
-                    <div className="mt-5 rounded-xl bg-violet-500/10 p-4">
-                      <h4 className="font-bold text-violet-300">Premiação</h4>
-                      <p className="mt-2 whitespace-pre-wrap break-words text-sm text-zinc-300">
-                        {tournament.prizes_description}
-                      </p>
-                    </div>
-                  )}
-
-                  {tournament.rules && (
-                    <details className="mt-5 rounded-xl border border-white/10 p-4">
-                      <summary className="cursor-pointer font-semibold">
-                        Ver regulamento
-                      </summary>
-                      <p className="mt-3 whitespace-pre-wrap break-words text-sm text-zinc-400">
-                        {tournament.rules}
-                      </p>
-                    </details>
-                  )}
-                  {tournament.status !== "draft" && (
-                    <div className="mt-5 flex flex-wrap gap-3">
-                      <Link
-                        href={`/arena/${tournament.id}/bracket`}
-                        className="rounded-xl bg-violet-600 px-5 py-3 text-sm font-bold text-white hover:bg-violet-500"
-                      >
-                        Ver chave
-                      </Link>
-
-                      {isAdmin && (
+                    {tournament.status !== "draft" && (
+                      <div className="mt-5 flex flex-wrap gap-3">
                         <Link
-                          href={`/arena/${tournament.id}/registrations`}
-                          className="rounded-xl border border-violet-500/30 px-5 py-3 text-sm font-bold text-violet-300 hover:bg-violet-500/10"
+                          href={`/arena/${tournament.id}/bracket`}
+                          className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
                         >
-                          Ver inscrições
+                          Ver chave
                         </Link>
-                      )}
-                    </div>
-                  )}
 
-                  {isAdmin && (
-                    <div className="mt-6 flex flex-wrap gap-3">
-                      {tournament.status === "draft" && (
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() => changeStatus(tournament, "published")}
-                          className="rounded-xl bg-violet-600 px-5 py-3 text-sm font-bold hover:bg-violet-500 disabled:opacity-50"
-                        >
-                          {updating ? "Atualizando..." : "Publicar torneio"}
-                        </button>
-                      )}
+                        {isAdmin && (
+                          <Link
+                            href={`/arena/${tournament.id}/registrations`}
+                            className="rounded-xl border border-blue-200 bg-white px-5 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-50"
+                          >
+                            Ver inscrições
+                          </Link>
+                        )}
+                      </div>
+                    )}
 
-                      {!["cancelled", "completed"].includes(
-                        tournament.status,
-                      ) && (
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() => changeStatus(tournament, "cancelled")}
-                          className="rounded-xl border border-red-500/30 px-5 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-50"
-                        >
-                          {updating ? "Atualizando..." : "Cancelar torneio"}
-                        </button>
-                      )}
-                    </div>
-                  )}
+                    {isAdmin && (
+                      <div className="mt-6 flex flex-wrap gap-3 border-t border-blue-100 pt-5">
+                        {tournament.status === "draft" && (
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() =>
+                              changeStatus(tournament, "published")
+                            }
+                            className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {updating ? "Atualizando..." : "Publicar torneio"}
+                          </button>
+                        )}
 
-                  {tournament.status === "published" && (
-                    <TournamentRegistration
-                      tournamentId={tournament.id}
-                      tournamentFormat={tournament.format}
-                    />
-                  )}
+                        {!["cancelled", "completed"].includes(
+                          tournament.status,
+                        ) && (
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() =>
+                              changeStatus(tournament, "cancelled")
+                            }
+                            className="rounded-xl border border-red-200 bg-white px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {updating ? "Atualizando..." : "Cancelar torneio"}
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {tournament.status === "published" && (
+                      <TournamentRegistration
+                        tournamentId={tournament.id}
+                        tournamentFormat={tournament.format}
+                      />
+                    )}
+                  </div>
                 </article>
               );
             })}

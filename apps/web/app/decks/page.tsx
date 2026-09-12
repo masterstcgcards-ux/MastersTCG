@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import { DecksManager } from "@/components/decks-manager";
 import { LogoutButton } from "@/components/logout-button";
@@ -58,66 +59,88 @@ async function DecksContent() {
   }));
 
   return (
-    <main className="min-h-screen bg-[#09090f] text-white">
-      <header className="border-b border-white/10 bg-[#0d0d16]">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-6 py-5">
-          <Link
-            href="/"
-            aria-label="MastersTCG — início"
-            className="text-2xl font-black tracking-tight"
-          >
-            MASTERS<span className="text-violet-400">TCG</span>
+    <main className="min-h-screen bg-gradient-to-br from-white via-blue-50/30 to-white text-[#071a4c]">
+      <header className="border-b border-blue-100 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-6">
+          <Link href="/" aria-label="MastersTCG — início" className="shrink-0">
+            <Image
+              src="/masters-logo.png"
+              alt="MastersTCG"
+              width={1000}
+              height={270}
+              priority
+              className="h-auto w-[190px] sm:w-[240px]"
+            />
           </Link>
+
           <nav
             aria-label="Navegação principal"
-            className="flex flex-wrap items-center gap-5 text-sm text-zinc-400"
+            className="order-3 flex w-full gap-5 overflow-x-auto border-t border-blue-100 pt-4 text-sm font-semibold text-slate-500 md:order-none md:w-auto md:border-0 md:pt-0"
           >
-            <Link href="/collection" className="hover:text-white">
+            <Link
+              href="/collection"
+              className="shrink-0 transition hover:text-blue-600"
+            >
               Minha coleção
             </Link>
 
-            <Link href="/decks" className="font-semibold text-white">
-              Meus decks
-            </Link>
+            <span className="shrink-0 font-bold text-blue-600">Meus decks</span>
 
-            <Link href="/marketplace" className="hover:text-white">
+            <Link
+              href="/marketplace"
+              className="shrink-0 transition hover:text-blue-600"
+            >
               Marketplace
             </Link>
 
-            <Link href="/arena" className="hover:text-white">
+            <Link
+              href="/arena"
+              className="shrink-0 transition hover:text-blue-600"
+            >
               Arena
             </Link>
 
-            <Link href="/ranking" className="hover:text-white">
+            <Link
+              href="/ranking"
+              className="shrink-0 transition hover:text-blue-600"
+            >
               Ranking
             </Link>
 
-            <Link href="/profile" className="hover:text-white">
+            <Link
+              href="/profile"
+              className="shrink-0 transition hover:text-blue-600"
+            >
               Meu perfil
             </Link>
           </nav>
+
           <LogoutButton />
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 py-10">
+      <section className="mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-14">
         <div className="mb-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-400">
+          <span className="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-600">
+            <span aria-hidden="true">✦</span>
             Preparação para a Arena
-          </p>
+          </span>
 
-          <h1 className="mt-3 text-4xl font-black tracking-tight">
+          <h1 className="mt-5 text-4xl font-black tracking-tight text-[#071a4c] sm:text-5xl">
             Meus decks
           </h1>
 
-          <p className="mt-3 max-w-2xl text-zinc-400">
+          <p className="mt-3 max-w-2xl text-lg leading-relaxed text-slate-600">
             Crie seus decks de Pokémon TCG, adicione cartas da sua coleção e
             prepare-se para os torneios da Arena.
           </p>
         </div>
 
         {error ? (
-          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-red-200">
+          <div
+            role="alert"
+            className="rounded-2xl border border-red-200 bg-red-50 p-5 text-red-700"
+          >
             Não foi possível carregar seus decks: {error.message}
           </div>
         ) : (
@@ -130,8 +153,8 @@ async function DecksContent() {
 
 function DecksLoading() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#09090f] text-white">
-      <p className="text-zinc-400">Carregando seus decks...</p>
+    <main className="flex min-h-screen items-center justify-center bg-blue-50 text-[#071a4c]">
+      <p className="font-semibold text-slate-500">Carregando seus decks...</p>
     </main>
   );
 }

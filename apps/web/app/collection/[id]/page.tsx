@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import { CardManager } from "@/components/card-manager";
 import { createClient } from "@/lib/supabase/server";
@@ -72,81 +73,105 @@ async function CardContent({ params }: CardPageProps) {
   ]);
 
   return (
-    <main className="min-h-screen bg-[#09090f] text-white">
-      <header className="border-b border-white/10 bg-[#0d0d16]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-6 py-5">
-          <Link
-            href="/"
-            aria-label="MastersTCG — início"
-            className="text-2xl font-black tracking-tight"
-          >
-            MASTERS<span className="text-violet-400">TCG</span>
+    <main className="min-h-screen bg-gradient-to-br from-white via-blue-50/40 to-white text-[#071a4c]">
+      <header className="border-b border-blue-100 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4 sm:px-6">
+          <Link href="/" aria-label="MastersTCG — início" className="shrink-0">
+            <Image
+              src="/masters-logo.png"
+              alt="MastersTCG"
+              width={1000}
+              height={270}
+              priority
+              className="h-auto w-[190px] sm:w-[230px]"
+            />
           </Link>
 
           <Link
             href="/collection"
-            className="rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-violet-400 hover:text-white"
+            className="rounded-xl border border-blue-200 bg-white px-4 py-2 text-sm font-bold text-blue-600 transition hover:border-blue-500 hover:bg-blue-50"
           >
             ← Voltar para coleção
           </Link>
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 py-10">
+      <section className="mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-14">
         <div className="mb-8">
-          <p className="text-sm font-bold uppercase tracking-[0.25em] text-violet-400">
+          <p className="text-sm font-bold uppercase tracking-[0.22em] text-blue-600">
             Minha coleção
           </p>
 
-          <h1 className="mt-2 text-4xl font-black tracking-tight">
+          <h1 className="mt-3 break-words text-4xl font-black tracking-tight text-[#071a4c] sm:text-5xl">
             {card.card_name || "Carta sem nome"}
           </h1>
+
+          <p className="mt-3 text-slate-600">
+            Consulte as imagens e informações cadastradas.
+          </p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(340px,0.9fr)]">
           <section>
             <div className="grid gap-6 sm:grid-cols-2">
               <article>
-                <p className="mb-3 text-sm font-bold uppercase tracking-wider text-zinc-400">
-                  Frente
-                </p>
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-sm font-black uppercase tracking-wider text-[#071a4c]">
+                    Frente
+                  </p>
 
-                <div className="flex aspect-[2.5/3.5] items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-violet-950 to-zinc-950">
+                  <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-600">
+                    Principal
+                  </span>
+                </div>
+
+                <div className="flex aspect-[2.5/3.5] items-center justify-center overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 to-slate-100 p-3 shadow-sm">
                   {frontImageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={frontImageUrl}
                       alt={`Frente da carta ${card.card_name || ""}`}
-                      className="h-full w-full object-contain"
+                      className="h-full w-full rounded-2xl object-contain"
                     />
                   ) : (
-                    <p className="px-6 text-center text-zinc-500">
-                      Esta carta não possui foto da frente.
-                    </p>
+                    <div className="px-6 text-center">
+                      <p className="text-5xl text-blue-200">▣</p>
+                      <p className="mt-4 text-sm font-semibold text-slate-500">
+                        Esta carta não possui foto da frente.
+                      </p>
+                    </div>
                   )}
                 </div>
               </article>
 
               <article>
-                <p className="mb-3 text-sm font-bold uppercase tracking-wider text-zinc-400">
-                  Verso
-                </p>
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-sm font-black uppercase tracking-wider text-[#071a4c]">
+                    Verso
+                  </p>
 
-                <div className="flex aspect-[2.5/3.5] items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-violet-950">
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
+                    Opcional
+                  </span>
+                </div>
+
+                <div className="flex aspect-[2.5/3.5] items-center justify-center overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 to-slate-100 p-3 shadow-sm">
                   {backImageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={backImageUrl}
                       alt={`Verso da carta ${card.card_name || ""}`}
-                      className="h-full w-full object-contain"
+                      className="h-full w-full rounded-2xl object-contain"
                     />
                   ) : (
                     <div className="px-6 text-center">
-                      <p className="text-zinc-400">
+                      <p className="text-5xl text-blue-200">▣</p>
+
+                      <p className="mt-4 font-semibold text-slate-500">
                         Foto do verso não cadastrada.
                       </p>
 
-                      <p className="mt-2 text-sm text-zinc-600">
+                      <p className="mt-2 text-sm text-slate-400">
                         As cartas cadastradas anteriormente continuam
                         funcionando normalmente.
                       </p>
@@ -166,8 +191,8 @@ async function CardContent({ params }: CardPageProps) {
 
 function CardLoading() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#09090f] text-white">
-      <p className="text-zinc-400">Carregando carta...</p>
+    <main className="flex min-h-screen items-center justify-center bg-blue-50 text-[#071a4c]">
+      <p className="font-semibold text-slate-500">Carregando carta...</p>
     </main>
   );
 }

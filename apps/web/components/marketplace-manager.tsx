@@ -1,10 +1,10 @@
 "use client";
-import Link from "next/link";
 
+import Link from "next/link";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
-import { createClient } from "@/lib/supabase/client";
 import { ReportForm } from "@/components/report-form";
+import { createClient } from "@/lib/supabase/client";
 
 export type MarketplaceCard = {
   id: string;
@@ -50,7 +50,7 @@ type MarketplaceManagerProps = {
 };
 
 const fieldClass =
-  "mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none placeholder:text-zinc-600 focus:border-violet-500";
+  "mt-2 w-full rounded-xl border border-blue-200 bg-white px-4 py-3 text-[#071a4c] outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100";
 
 const typeLabels: Record<string, string> = {
   sale: "Venda",
@@ -68,13 +68,13 @@ const statusLabels: Record<string, string> = {
 };
 
 const statusStyles: Record<string, string> = {
-  active: "bg-green-500/15 text-green-300",
-  paused: "bg-yellow-500/15 text-yellow-200",
-  reserved: "bg-blue-500/15 text-blue-200",
-  sold: "bg-violet-500/15 text-violet-200",
-  traded: "bg-violet-500/15 text-violet-200",
-  cancelled: "bg-zinc-500/15 text-zinc-400",
-  draft: "bg-zinc-500/15 text-zinc-300",
+  active: "bg-emerald-100 text-emerald-700",
+  paused: "bg-amber-100 text-amber-800",
+  reserved: "bg-blue-100 text-blue-700",
+  sold: "bg-indigo-100 text-indigo-700",
+  traded: "bg-indigo-100 text-indigo-700",
+  cancelled: "bg-slate-100 text-slate-600",
+  draft: "bg-slate-100 text-slate-600",
 };
 
 function formatPrice(value: number | null) {
@@ -388,19 +388,21 @@ export function MarketplaceManager({
   }
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-2xl border border-violet-500/20 bg-violet-500/10 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-5">
+    <div className="space-y-10">
+      <section className="overflow-hidden rounded-3xl border border-blue-200 bg-blue-50">
+        <div className="flex flex-wrap items-center justify-between gap-5 p-6 sm:p-8">
           <div>
-            <p className="text-sm font-semibold text-violet-300">
+            <p className="text-sm font-bold uppercase tracking-wider text-blue-700">
               Sua vitrine no universo TCG
             </p>
 
-            <h2 className="mt-2 text-2xl font-black">Anuncie uma carta</h2>
+            <h2 className="mt-2 text-2xl font-black text-[#071a4c]">
+              Anuncie uma carta
+            </h2>
 
-            <p className="mt-2 max-w-2xl text-sm text-zinc-300">
-              Escolha uma carta da sua coleção e publique para venda, troca ou
-              leilão.
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+              Escolha uma carta da sua coleção e publique para venda ou troca.
+              Para criar um leilão, acesse a área de leilões.
             </p>
           </div>
 
@@ -411,7 +413,7 @@ export function MarketplaceManager({
               setError("");
               setMessage("");
             }}
-            className="rounded-xl bg-violet-600 px-6 py-3 font-bold text-white hover:bg-violet-500"
+            className="rounded-xl bg-blue-700 px-6 py-3 font-bold text-white shadow-sm transition hover:bg-blue-800"
           >
             {showForm ? "Fechar formulário" : "Criar anúncio"}
           </button>
@@ -420,15 +422,18 @@ export function MarketplaceManager({
         {showForm && (
           <form
             onSubmit={handleCreate}
-            className="mt-7 border-t border-white/10 pt-7"
+            className="border-t border-blue-200 bg-white p-6 sm:p-8"
           >
             <fieldset
               disabled={saving}
-              className="grid min-w-0 gap-6 disabled:opacity-60 lg:grid-cols-2"
+              className="grid min-w-0 gap-8 disabled:opacity-60 lg:grid-cols-2"
             >
               <div className="space-y-5">
                 <div>
-                  <label htmlFor="marketplace-card" className="font-semibold">
+                  <label
+                    htmlFor="marketplace-card"
+                    className="font-semibold text-[#071a4c]"
+                  >
                     Carta da coleção *
                   </label>
 
@@ -460,21 +465,21 @@ export function MarketplaceManager({
                   </select>
 
                   {cards.length === 0 && (
-                    <p className="mt-2 text-sm text-yellow-200">
+                    <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                       Cadastre uma carta na sua coleção antes de criar um
                       anúncio.
                     </p>
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setListingType("sale")}
-                    className={`rounded-xl border px-4 py-3 font-bold ${
+                    className={`rounded-xl border px-4 py-3 font-bold transition ${
                       listingType === "sale"
-                        ? "border-violet-400 bg-violet-500/20 text-white"
-                        : "border-white/10 text-zinc-400"
+                        ? "border-blue-700 bg-blue-700 text-white"
+                        : "border-blue-200 bg-white text-slate-600 hover:border-blue-400"
                     }`}
                   >
                     Venda
@@ -483,10 +488,10 @@ export function MarketplaceManager({
                   <button
                     type="button"
                     onClick={() => setListingType("trade")}
-                    className={`rounded-xl border px-4 py-3 font-bold ${
+                    className={`rounded-xl border px-4 py-3 font-bold transition ${
                       listingType === "trade"
-                        ? "border-violet-400 bg-violet-500/20 text-white"
-                        : "border-white/10 text-zinc-400"
+                        ? "border-blue-700 bg-blue-700 text-white"
+                        : "border-blue-200 bg-white text-slate-600 hover:border-blue-400"
                     }`}
                   >
                     Troca
@@ -494,7 +499,10 @@ export function MarketplaceManager({
                 </div>
 
                 <div>
-                  <label htmlFor="listing-title" className="font-semibold">
+                  <label
+                    htmlFor="listing-title"
+                    className="font-semibold text-[#071a4c]"
+                  >
                     Título do anúncio *
                   </label>
 
@@ -513,7 +521,10 @@ export function MarketplaceManager({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="listing-quantity" className="font-semibold">
+                    <label
+                      htmlFor="listing-quantity"
+                      className="font-semibold text-[#071a4c]"
+                    >
                       Quantidade *
                     </label>
 
@@ -531,7 +542,10 @@ export function MarketplaceManager({
 
                   {listingType === "sale" && (
                     <div>
-                      <label htmlFor="listing-price" className="font-semibold">
+                      <label
+                        htmlFor="listing-price"
+                        className="font-semibold text-[#071a4c]"
+                      >
                         Preço *
                       </label>
 
@@ -553,7 +567,7 @@ export function MarketplaceManager({
                   <div>
                     <label
                       htmlFor="trade-preferences"
-                      className="font-semibold"
+                      className="font-semibold text-[#071a4c]"
                     >
                       O que aceita na troca?
                     </label>
@@ -571,25 +585,33 @@ export function MarketplaceManager({
               </div>
 
               <div className="space-y-5">
-                <div className="flex min-h-64 items-center justify-center overflow-hidden rounded-2xl border border-dashed border-white/15 bg-black/20 p-5">
-                  {selectedCard?.image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={selectedCard.image_url}
-                      alt={selectedCard.card_name || "Carta selecionada"}
-                      className="max-h-80 max-w-full rounded-xl object-contain"
-                    />
-                  ) : (
-                    <p className="text-center text-sm text-zinc-500">
-                      A imagem da carta selecionada aparecerá aqui.
-                    </p>
-                  )}
+                <div className="flex justify-center rounded-2xl border border-dashed border-blue-200 bg-blue-50 p-5">
+                  <div className="flex aspect-[2.5/3.5] w-full max-w-[250px] items-center justify-center overflow-hidden rounded-2xl bg-white p-2 shadow-sm">
+                    {selectedCard?.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={selectedCard.image_url}
+                        alt={selectedCard.card_name || "Carta selecionada"}
+                        className="h-full w-full object-contain"
+                      />
+                    ) : (
+                      <div className="px-4 text-center">
+                        <div className="mx-auto flex h-16 w-12 items-center justify-center rounded-lg bg-blue-100 text-xl font-black text-blue-700">
+                          M
+                        </div>
+
+                        <p className="mt-4 text-sm text-slate-500">
+                          A imagem da carta selecionada aparecerá aqui.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div>
                   <label
                     htmlFor="listing-description"
-                    className="font-semibold"
+                    className="font-semibold text-[#071a4c]"
                   >
                     Descrição
                   </label>
@@ -606,7 +628,10 @@ export function MarketplaceManager({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="listing-city" className="font-semibold">
+                    <label
+                      htmlFor="listing-city"
+                      className="font-semibold text-[#071a4c]"
+                    >
                       Cidade
                     </label>
 
@@ -620,7 +645,10 @@ export function MarketplaceManager({
                   </div>
 
                   <div>
-                    <label htmlFor="listing-state" className="font-semibold">
+                    <label
+                      htmlFor="listing-state"
+                      className="font-semibold text-[#071a4c]"
+                    >
                       Estado
                     </label>
 
@@ -635,14 +663,14 @@ export function MarketplaceManager({
                   </div>
                 </div>
 
-                <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 p-4">
+                <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 text-slate-700">
                   <input
                     name="shipping_available"
                     type="checkbox"
-                    className="h-4 w-4 accent-violet-600"
+                    className="h-5 w-5 accent-blue-700"
                   />
 
-                  <span className="text-sm">
+                  <span className="text-sm font-medium">
                     Posso enviar a carta para outras cidades
                   </span>
                 </label>
@@ -650,7 +678,7 @@ export function MarketplaceManager({
                 <button
                   type="submit"
                   disabled={saving || cards.length === 0}
-                  className="w-full rounded-xl bg-violet-600 px-6 py-3 font-bold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-xl bg-yellow-400 px-6 py-4 font-black text-[#071a4c] shadow-sm transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {saving ? "Publicando..." : "Publicar anúncio"}
                 </button>
@@ -663,7 +691,7 @@ export function MarketplaceManager({
       {message && (
         <div
           role="status"
-          className="rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-green-200"
+          className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-medium text-emerald-700"
         >
           {message}
         </div>
@@ -672,7 +700,7 @@ export function MarketplaceManager({
       {error && (
         <div
           role="alert"
-          className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 font-medium text-red-700"
         >
           {error}
         </div>
@@ -681,27 +709,31 @@ export function MarketplaceManager({
       <section>
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
-            <h2 className="text-2xl font-black">
+            <p className="text-sm font-bold uppercase tracking-wider text-blue-700">
+              Cartas de colecionadores
+            </p>
+
+            <h2 className="mt-2 text-2xl font-black text-[#071a4c]">
               {currentTab === "marketplace"
                 ? "Cartas anunciadas"
                 : "Meus anúncios"}
             </h2>
 
-            <p className="mt-2 text-sm text-zinc-400">
+            <p className="mt-2 text-sm text-slate-600">
               {currentTab === "marketplace"
                 ? "Explore as cartas anunciadas por outros Masters."
                 : "Pause, reative ou encerre seus anúncios."}
             </p>
           </div>
 
-          <div className="flex rounded-xl border border-white/10 bg-black/20 p-1">
+          <div className="flex rounded-xl border border-blue-200 bg-blue-50 p-1">
             <button
               type="button"
               onClick={() => setCurrentTab("marketplace")}
-              className={`rounded-lg px-4 py-2 text-sm font-bold ${
+              className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
                 currentTab === "marketplace"
-                  ? "bg-violet-600 text-white"
-                  : "text-zinc-400"
+                  ? "bg-blue-700 text-white shadow-sm"
+                  : "text-slate-600 hover:text-blue-700"
               }`}
             >
               Marketplace
@@ -710,10 +742,10 @@ export function MarketplaceManager({
             <button
               type="button"
               onClick={() => setCurrentTab("mine")}
-              className={`rounded-lg px-4 py-2 text-sm font-bold ${
+              className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
                 currentTab === "mine"
-                  ? "bg-violet-600 text-white"
-                  : "text-zinc-400"
+                  ? "bg-blue-700 text-white shadow-sm"
+                  : "text-slate-600 hover:text-blue-700"
               }`}
             >
               Meus anúncios
@@ -727,13 +759,13 @@ export function MarketplaceManager({
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Buscar carta, coleção, vendedor ou cidade..."
-            className="rounded-xl border border-white/10 bg-[#11111b] px-4 py-3 outline-none placeholder:text-zinc-600 focus:border-violet-500"
+            className="rounded-xl border border-blue-200 bg-white px-4 py-3 text-[#071a4c] outline-none placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
           />
 
           <select
             value={typeFilter}
             onChange={(event) => setTypeFilter(event.target.value)}
-            className="rounded-xl border border-white/10 bg-[#11111b] px-4 py-3 outline-none focus:border-violet-500"
+            className="rounded-xl border border-blue-200 bg-white px-4 py-3 text-[#071a4c] outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
           >
             <option value="all">Todos os anúncios</option>
             <option value="sale">Somente vendas</option>
@@ -742,46 +774,49 @@ export function MarketplaceManager({
         </div>
 
         {displayedListings.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-white/15 p-10 text-center text-zinc-400">
+          <div className="mt-6 rounded-2xl border border-dashed border-blue-200 bg-blue-50/50 p-10 text-center text-slate-500">
             {currentTab === "marketplace"
               ? "Nenhum anúncio encontrado."
               : "Você ainda não possui anúncios."}
           </div>
         ) : (
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-6 xl:grid-cols-3">
             {displayedListings.map((listing) => {
               const updating = updatingId === listing.listing_id;
 
               return (
                 <article
                   key={listing.listing_id}
-                  className="overflow-hidden rounded-2xl border border-white/10 bg-[#13131d]"
+                  className="min-w-0 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl"
                 >
-                  <div className="flex min-h-72 items-center justify-center bg-black/20 p-5">
+                  <div className="flex aspect-[2.5/3.5] items-center justify-center bg-gradient-to-b from-blue-50 to-white p-2 sm:p-5">
                     {listing.image_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={listing.image_url}
                         alt={listing.card_name}
-                        className="max-h-72 max-w-full rounded-xl object-contain"
+                        className="h-full w-full object-contain"
                       />
                     ) : (
-                      <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-violet-600/20 text-3xl font-black text-violet-300">
-                        M
+                      <div className="flex h-24 w-16 flex-col items-center justify-center rounded-xl border-2 border-blue-200 bg-blue-700 text-white shadow-md">
+                        <span className="text-3xl font-black">M</span>
+                        <span className="mt-1 text-[8px] font-bold tracking-widest text-yellow-300">
+                          TCG
+                        </span>
                       </div>
                     )}
                   </div>
 
-                  <div className="p-5">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <span className="rounded-full bg-violet-500/15 px-3 py-1 text-xs font-bold text-violet-200">
+                  <div className="p-3 sm:p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="rounded-full bg-blue-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-700 sm:text-xs">
                         {typeLabels[listing.listing_type] ||
                           listing.listing_type}
                       </span>
 
                       {currentTab === "mine" && (
                         <span
-                          className={`rounded-full px-3 py-1 text-xs font-bold ${
+                          className={`rounded-full px-2.5 py-1 text-[10px] font-bold sm:text-xs ${
                             statusStyles[listing.listing_status] ||
                             statusStyles.draft
                           }`}
@@ -792,22 +827,22 @@ export function MarketplaceManager({
                       )}
 
                       {listing.is_own && currentTab === "marketplace" && (
-                        <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-zinc-300">
+                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 sm:text-xs">
                           Seu anúncio
                         </span>
                       )}
                     </div>
 
-                    <h3 className="mt-4 break-words text-xl font-black">
+                    <h3 className="mt-3 break-words text-base font-black leading-tight text-[#071a4c] sm:mt-4 sm:text-xl">
                       {listing.title}
                     </h3>
 
-                    <p className="mt-2 font-semibold text-zinc-200">
+                    <p className="mt-2 break-words text-sm font-semibold text-slate-700">
                       {listing.card_name}
                     </p>
 
                     {(listing.set_name || listing.card_number) && (
-                      <p className="mt-1 text-sm text-zinc-500">
+                      <p className="mt-1 break-words text-xs text-slate-500 sm:text-sm">
                         {[listing.set_name, listing.card_number]
                           .filter(Boolean)
                           .join(" • ")}
@@ -816,17 +851,18 @@ export function MarketplaceManager({
 
                     {listing.listing_type === "sale" &&
                       listing.price !== null && (
-                        <p className="mt-4 text-2xl font-black text-green-300">
+                        <p className="mt-4 text-lg font-black text-emerald-600 sm:text-2xl">
                           {formatPrice(listing.price)}
                         </p>
                       )}
 
                     {listing.listing_type === "trade" && (
-                      <div className="mt-4 rounded-xl bg-violet-500/10 p-3">
-                        <p className="text-xs font-bold uppercase tracking-wider text-violet-300">
+                      <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-blue-700 sm:text-xs">
                           Procura na troca
                         </p>
-                        <p className="mt-2 break-words text-sm text-zinc-300">
+
+                        <p className="mt-2 break-words text-xs text-slate-600 sm:text-sm">
                           {listing.trade_preferences ||
                             "Vendedor aberto a propostas."}
                         </p>
@@ -834,29 +870,29 @@ export function MarketplaceManager({
                     )}
 
                     {listing.description && (
-                      <p className="mt-4 whitespace-pre-wrap break-words text-sm text-zinc-400">
+                      <p className="mt-4 whitespace-pre-wrap break-words text-xs text-slate-600 sm:text-sm">
                         {listing.description}
                       </p>
                     )}
 
-                    <dl className="mt-5 grid grid-cols-2 gap-3 border-t border-white/10 pt-4 text-sm">
+                    <dl className="mt-5 grid grid-cols-1 gap-3 border-t border-blue-100 pt-4 text-xs sm:grid-cols-2 sm:text-sm">
                       <div>
-                        <dt className="text-zinc-500">Quantidade</dt>
-                        <dd className="mt-1 font-semibold">
+                        <dt className="text-slate-500">Quantidade</dt>
+                        <dd className="mt-1 font-semibold text-[#071a4c]">
                           {listing.quantity}
                         </dd>
                       </div>
 
                       <div>
-                        <dt className="text-zinc-500">Vendedor</dt>
-                        <dd className="mt-1 truncate font-semibold">
+                        <dt className="text-slate-500">Vendedor</dt>
+                        <dd className="mt-1 truncate font-semibold text-[#071a4c]">
                           {listing.seller_display_name}
                         </dd>
                       </div>
 
                       <div>
-                        <dt className="text-zinc-500">Localização</dt>
-                        <dd className="mt-1 font-semibold">
+                        <dt className="text-slate-500">Localização</dt>
+                        <dd className="mt-1 break-words font-semibold text-[#071a4c]">
                           {[listing.city, listing.state]
                             .filter(Boolean)
                             .join(" - ") || "Não informada"}
@@ -864,8 +900,8 @@ export function MarketplaceManager({
                       </div>
 
                       <div>
-                        <dt className="text-zinc-500">Envio</dt>
-                        <dd className="mt-1 font-semibold">
+                        <dt className="text-slate-500">Envio</dt>
+                        <dd className="mt-1 font-semibold text-[#071a4c]">
                           {listing.shipping_available
                             ? "Disponível"
                             : "A combinar"}
@@ -873,16 +909,17 @@ export function MarketplaceManager({
                       </div>
                     </dl>
 
-                    <p className="mt-4 text-xs text-zinc-600">
+                    <p className="mt-4 text-[10px] text-slate-400 sm:text-xs">
                       Publicado em {formatDate(listing.created_at)}
                     </p>
+
                     {!listing.is_own && (
                       <>
                         <Link
                           href={`/reputation/${listing.seller_id}`}
-                          className="mt-4 inline-flex text-sm font-bold text-yellow-300 hover:text-yellow-200"
+                          className="mt-4 inline-flex text-xs font-bold text-amber-600 hover:text-amber-700 sm:text-sm"
                         >
-                          ★ Ver reputação do vendedor
+                          ★ Ver reputação
                         </Link>
 
                         <ReportForm
@@ -898,7 +935,7 @@ export function MarketplaceManager({
                       !listing.is_own && (
                         <Link
                           href={`/marketplace/${listing.listing_id}/buy`}
-                          className="mt-5 block w-full rounded-xl bg-emerald-600 px-5 py-3 text-center text-sm font-bold text-white hover:bg-emerald-500"
+                          className="mt-5 block w-full rounded-xl bg-emerald-600 px-3 py-3 text-center text-xs font-bold text-white transition hover:bg-emerald-700 sm:px-5 sm:text-sm"
                         >
                           Comprar
                         </Link>
@@ -909,13 +946,14 @@ export function MarketplaceManager({
                       !listing.is_own && (
                         <Link
                           href={`/marketplace/${listing.listing_id}/offer`}
-                          className="mt-5 block w-full rounded-xl bg-violet-600 px-5 py-3 text-center text-sm font-bold text-white hover:bg-violet-500"
+                          className="mt-5 block w-full rounded-xl bg-blue-700 px-3 py-3 text-center text-xs font-bold text-white transition hover:bg-blue-800 sm:px-5 sm:text-sm"
                         >
                           Fazer proposta
                         </Link>
                       )}
+
                     {currentTab === "mine" && (
-                      <div className="mt-5 flex flex-wrap gap-2">
+                      <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                         {listing.listing_status === "active" && (
                           <button
                             type="button"
@@ -923,7 +961,7 @@ export function MarketplaceManager({
                             onClick={() =>
                               handleStatusChange(listing.listing_id, "paused")
                             }
-                            className="rounded-lg border border-yellow-500/30 px-4 py-2 text-sm font-bold text-yellow-200 hover:bg-yellow-500/10 disabled:opacity-50"
+                            className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-800 hover:bg-amber-100 disabled:opacity-50 sm:px-4 sm:text-sm"
                           >
                             {updating ? "Atualizando..." : "Pausar"}
                           </button>
@@ -936,7 +974,7 @@ export function MarketplaceManager({
                             onClick={() =>
                               handleStatusChange(listing.listing_id, "active")
                             }
-                            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-bold text-white hover:bg-green-500 disabled:opacity-50"
+                            className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700 disabled:opacity-50 sm:px-4 sm:text-sm"
                           >
                             {updating ? "Atualizando..." : "Reativar"}
                           </button>
@@ -954,7 +992,7 @@ export function MarketplaceManager({
                                 "cancelled",
                               )
                             }
-                            className="rounded-lg border border-red-500/30 px-4 py-2 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-100 disabled:opacity-50 sm:px-4 sm:text-sm"
                           >
                             Encerrar
                           </button>
@@ -964,7 +1002,7 @@ export function MarketplaceManager({
                           type="button"
                           disabled={updating}
                           onClick={() => handleDelete(listing.listing_id)}
-                          className="rounded-lg border border-white/10 px-4 py-2 text-sm font-bold text-zinc-400 hover:bg-white/5 disabled:opacity-50"
+                          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50 sm:px-4 sm:text-sm"
                         >
                           Excluir
                         </button>

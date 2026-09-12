@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -171,7 +172,6 @@ export function DeckBuilder({
   }, [collectionCards, quantitiesByCardName]);
 
   const deckIsValid = totalCards === 60 && copyViolations.length === 0;
-
   const progress = Math.min(100, Math.round((totalCards / 60) * 100));
   const remainingCards = Math.max(0, 60 - totalCards);
 
@@ -277,104 +277,119 @@ export function DeckBuilder({
   }
 
   return (
-    <main className="min-h-screen bg-[#09090f] text-white">
-      <header className="border-b border-white/10 bg-[#0d0d16]">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-6 py-5">
-          <Link href="/" className="text-2xl font-black tracking-tight">
-            MASTERS<span className="text-violet-400">TCG</span>
+    <main className="min-h-screen bg-gradient-to-br from-white via-blue-50/30 to-white text-[#071a4c]">
+      <header className="border-b border-blue-100 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-6">
+          <Link href="/" aria-label="MastersTCG — início" className="shrink-0">
+            <Image
+              src="/masters-logo.png"
+              alt="MastersTCG"
+              width={1000}
+              height={270}
+              priority
+              className="h-auto w-[190px] sm:w-[240px]"
+            />
           </Link>
 
-          <nav className="flex flex-wrap items-center gap-5 text-sm text-zinc-400">
-            <Link href="/collection" className="hover:text-white">
+          <nav className="flex flex-wrap items-center gap-5 text-sm font-semibold text-slate-500">
+            <Link href="/collection" className="transition hover:text-blue-600">
               Minha coleção
             </Link>
 
-            <Link href="/decks" className="font-semibold text-white">
+            <Link href="/decks" className="font-bold text-blue-600">
               Meus decks
             </Link>
 
-            <Link href="/profile" className="hover:text-white">
+            <Link href="/profile" className="transition hover:text-blue-600">
               Meu perfil
             </Link>
           </nav>
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 py-10">
-        <Link href="/decks" className="text-sm text-zinc-400 hover:text-white">
+      <section className="mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-14">
+        <Link
+          href="/decks"
+          className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 transition hover:text-blue-700"
+        >
           ← Voltar aos meus decks
         </Link>
 
-        <div className="mt-6 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+        <div className="mt-7 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-400">
+            <span className="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-600">
+              <span aria-hidden="true">✦</span>
               Montagem do deck
-            </p>
+            </span>
 
-            <h1 className="mt-3 text-3xl font-black sm:text-4xl">{deckName}</h1>
+            <h1 className="mt-5 break-words text-4xl font-black tracking-tight text-[#071a4c] sm:text-5xl">
+              {deckName}
+            </h1>
 
-            <p className="mt-2 text-zinc-400">
+            <p className="mt-2 font-semibold text-slate-500">
               Formato: {deckFormat || "Não informado"}
             </p>
           </div>
 
           <div
-            className={`rounded-2xl border px-6 py-4 ${
+            className={`rounded-3xl border px-7 py-5 shadow-sm ${
               deckIsValid
-                ? "border-green-500/30 bg-green-500/10"
-                : "border-violet-500/30 bg-violet-500/10"
+                ? "border-green-200 bg-green-50"
+                : "border-blue-200 bg-white"
             }`}
           >
             <p
-              className={`text-sm ${
-                deckIsValid ? "text-green-200" : "text-violet-200"
+              className={`text-sm font-bold ${
+                deckIsValid ? "text-green-700" : "text-blue-600"
               }`}
             >
               Cartas no deck
             </p>
 
-            <p className="mt-1 text-3xl font-black">
+            <p className="mt-1 text-4xl font-black text-[#071a4c]">
               {totalCards}
-              <span className="text-lg text-zinc-500">/60</span>
+              <span className="text-lg text-slate-400">/60</span>
             </p>
           </div>
         </div>
 
-        <div className="mt-8 rounded-2xl border border-white/10 bg-[#11111b] p-6">
+        <div className="mt-8 rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-              <h2 className="text-lg font-black">Validação do deck</h2>
+              <h2 className="text-xl font-black text-[#071a4c]">
+                Validação do deck
+              </h2>
 
               {deckIsValid ? (
-                <p className="mt-1 font-semibold text-green-300">
-                  ✓ ✓ Deck completo para enviar à revisão
+                <p className="mt-1 font-bold text-green-700">
+                  ✓ Deck completo para enviar à revisão
                 </p>
               ) : copyViolations.length > 0 ? (
-                <p className="mt-1 font-semibold text-red-300">
+                <p className="mt-1 font-bold text-red-600">
                   O deck possui cartas acima do limite permitido.
                 </p>
               ) : (
-                <p className="mt-1 text-zinc-400">
+                <p className="mt-1 text-slate-500">
                   Faltam {remainingCards} carta(s) para completar o deck.
                 </p>
               )}
             </div>
 
             <span
-              className={`w-fit rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider ${
+              className={`w-fit rounded-full px-4 py-2 text-xs font-black uppercase tracking-wider ${
                 deckIsValid
-                  ? "bg-green-500/15 text-green-300"
-                  : "bg-amber-500/15 text-amber-300"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-amber-100 text-amber-700"
               }`}
             >
               {deckIsValid ? "Pronto para jogar" : "Em construção"}
             </span>
           </div>
 
-          <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
+          <div className="mt-5 h-3 overflow-hidden rounded-full bg-blue-100">
             <div
               className={`h-full rounded-full transition-all ${
-                deckIsValid ? "bg-green-500" : "bg-violet-500"
+                deckIsValid ? "bg-green-500" : "bg-blue-600"
               }`}
               style={{ width: `${progress}%` }}
             />
@@ -382,14 +397,20 @@ export function DeckBuilder({
 
           <div className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
             <p
-              className={totalCards === 60 ? "text-green-300" : "text-zinc-400"}
+              className={
+                totalCards === 60
+                  ? "font-semibold text-green-700"
+                  : "text-slate-500"
+              }
             >
               {totalCards === 60 ? "✓" : "○"} Total de 60 cartas
             </p>
 
             <p
               className={
-                copyViolations.length === 0 ? "text-green-300" : "text-red-300"
+                copyViolations.length === 0
+                  ? "font-semibold text-green-700"
+                  : "font-semibold text-red-600"
               }
             >
               {copyViolations.length === 0 ? "✓" : "✕"} Limite de 4 cópias por
@@ -398,9 +419,9 @@ export function DeckBuilder({
           </div>
 
           {copyViolations.length > 0 && (
-            <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
               {copyViolations.map((violation) => (
-                <p key={violation.name} className="text-sm text-red-200">
+                <p key={violation.name} className="text-sm text-red-700">
                   {violation.name}: {violation.quantity} cópias. Remova{" "}
                   {violation.quantity - 4}.
                 </p>
@@ -408,7 +429,7 @@ export function DeckBuilder({
             </div>
           )}
 
-          <p className="mt-4 text-xs text-zinc-500">
+          <p className="mt-4 text-xs leading-relaxed text-slate-400">
             Energias Básicas não possuem o limite de quatro cópias. A
             verificação depende do nome informado no cadastro da carta.
           </p>
@@ -417,7 +438,7 @@ export function DeckBuilder({
         {message && (
           <div
             role="status"
-            className="mt-6 rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-green-200"
+            className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 font-semibold text-green-700"
           >
             {message}
           </div>
@@ -426,22 +447,32 @@ export function DeckBuilder({
         {error && (
           <div
             role="alert"
-            className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200"
+            className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-700"
           >
             {error}
           </div>
         )}
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[360px_1fr]">
-          <aside className="h-fit rounded-2xl border border-white/10 bg-[#11111b] p-6 lg:sticky lg:top-6">
-            <h2 className="text-xl font-black">Cartas escolhidas</h2>
+          <aside className="h-fit rounded-3xl border border-blue-100 bg-white p-6 shadow-sm lg:sticky lg:top-6">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-black text-[#071a4c]">
+                  Cartas escolhidas
+                </h2>
 
-            <p className="mt-2 text-sm text-zinc-400">
-              As alterações são salvas automaticamente.
-            </p>
+                <p className="mt-1 text-sm text-slate-500">
+                  Salvas automaticamente.
+                </p>
+              </div>
+
+              <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-black text-blue-600">
+                {totalCards}/60
+              </span>
+            </div>
 
             {cardsInDeck.length === 0 ? (
-              <div className="mt-6 rounded-xl border border-dashed border-white/15 p-6 text-center text-sm text-zinc-500">
+              <div className="mt-6 rounded-2xl border border-dashed border-blue-200 bg-blue-50/40 p-6 text-center text-sm text-slate-500">
                 Seu deck ainda não possui cartas.
               </div>
             ) : (
@@ -454,27 +485,27 @@ export function DeckBuilder({
                   return (
                     <div
                       key={card.id}
-                      className="rounded-xl border border-white/10 bg-black/20 p-4"
+                      className="rounded-2xl border border-blue-100 bg-blue-50/40 p-4"
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 className="font-bold">
+                        <div className="min-w-0">
+                          <h3 className="truncate font-black text-[#071a4c]">
                             {card.card_name || "Carta sem nome"}
                           </h3>
 
-                          <p className="mt-1 text-xs text-zinc-500">
+                          <p className="mt-1 truncate text-xs text-slate-500">
                             {card.set_name || "Coleção não informada"}
                             {card.card_number ? ` • ${card.card_number}` : ""}
                           </p>
 
                           {basicEnergy && (
-                            <span className="mt-2 inline-block rounded-full bg-blue-500/10 px-2 py-1 text-[10px] font-bold uppercase text-blue-300">
+                            <span className="mt-2 inline-block rounded-full bg-blue-100 px-2 py-1 text-[10px] font-bold uppercase text-blue-700">
                               Energia básica
                             </span>
                           )}
                         </div>
 
-                        <span className="rounded-lg bg-violet-500/15 px-3 py-1 text-sm font-bold text-violet-300">
+                        <span className="shrink-0 rounded-lg bg-blue-600 px-3 py-1 text-sm font-black text-white">
                           {quantity}x
                         </span>
                       </div>
@@ -484,13 +515,13 @@ export function DeckBuilder({
                           type="button"
                           disabled={saving || Boolean(savingCardId)}
                           onClick={() => updateCardQuantity(card, quantity - 1)}
-                          className="h-9 w-9 rounded-lg border border-white/15 font-bold hover:bg-white/10 disabled:opacity-50"
+                          className="h-10 w-10 rounded-xl border border-blue-200 bg-white font-black text-blue-600 transition hover:bg-blue-50 disabled:opacity-50"
                           aria-label={`Remover uma unidade de ${card.card_name}`}
                         >
                           −
                         </button>
 
-                        <span className="min-w-8 text-center font-bold">
+                        <span className="min-w-8 text-center font-black text-[#071a4c]">
                           {quantity}
                         </span>
 
@@ -504,7 +535,7 @@ export function DeckBuilder({
                             (!basicEnergy && getQuantityByCardName(card) >= 4)
                           }
                           onClick={() => updateCardQuantity(card, quantity + 1)}
-                          className="h-9 w-9 rounded-lg border border-white/15 font-bold hover:bg-white/10 disabled:opacity-50"
+                          className="h-10 w-10 rounded-xl border border-blue-200 bg-white font-black text-blue-600 transition hover:bg-blue-50 disabled:opacity-50"
                           aria-label={`Adicionar uma unidade de ${card.card_name}`}
                         >
                           +
@@ -514,7 +545,7 @@ export function DeckBuilder({
                           type="button"
                           disabled={saving || Boolean(savingCardId)}
                           onClick={() => updateCardQuantity(card, 0)}
-                          className="ml-auto text-xs font-semibold text-red-400 hover:text-red-300 disabled:opacity-50"
+                          className="ml-auto text-xs font-bold text-red-600 transition hover:text-red-700 disabled:opacity-50"
                         >
                           Remover
                         </button>
@@ -526,12 +557,14 @@ export function DeckBuilder({
             )}
           </aside>
 
-          <div>
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div className="min-w-0">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
-                <h2 className="text-2xl font-black">Cartas da minha coleção</h2>
+                <h2 className="text-2xl font-black text-[#071a4c]">
+                  Cartas da minha coleção
+                </h2>
 
-                <p className="mt-1 text-sm text-zinc-400">
+                <p className="mt-1 text-sm text-slate-500">
                   Escolha quais cartas farão parte deste deck.
                 </p>
               </div>
@@ -541,31 +574,33 @@ export function DeckBuilder({
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Buscar carta..."
-                className="w-full rounded-xl border border-white/10 bg-[#11111b] px-4 py-3 text-white outline-none placeholder:text-zinc-600 focus:border-violet-500 sm:max-w-xs"
+                className="w-full rounded-xl border border-blue-200 bg-white px-4 py-3 text-[#071a4c] outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:max-w-xs"
               />
             </div>
 
             {collectionCards.length === 0 ? (
-              <div className="mt-6 rounded-2xl border border-dashed border-white/15 p-10 text-center">
-                <h3 className="text-xl font-bold">Sua coleção está vazia</h3>
+              <div className="mt-6 rounded-3xl border border-dashed border-blue-200 bg-white p-10 text-center">
+                <h3 className="text-xl font-black text-[#071a4c]">
+                  Sua coleção está vazia
+                </h3>
 
-                <p className="mt-2 text-zinc-400">
+                <p className="mt-2 text-slate-500">
                   Adicione cartas à coleção antes de montar um deck.
                 </p>
 
                 <Link
                   href="/collection/scan"
-                  className="mt-6 inline-block rounded-xl bg-violet-600 px-5 py-3 font-bold hover:bg-violet-500"
+                  className="mt-6 inline-block rounded-xl bg-blue-600 px-5 py-3 font-black text-white transition hover:bg-blue-700"
                 >
                   Adicionar carta
                 </Link>
               </div>
             ) : filteredCards.length === 0 ? (
-              <div className="mt-6 rounded-2xl border border-dashed border-white/15 p-10 text-center text-zinc-400">
+              <div className="mt-6 rounded-3xl border border-dashed border-blue-200 bg-white p-10 text-center text-slate-500">
                 Nenhuma carta encontrada para essa busca.
               </div>
             ) : (
-              <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                 {filteredCards.map((card) => {
                   const quantityInDeck = deckQuantities[card.id] || 0;
                   const quantityByName = getQuantityByCardName(card);
@@ -576,49 +611,56 @@ export function DeckBuilder({
                   return (
                     <article
                       key={card.id}
-                      className="overflow-hidden rounded-2xl border border-white/10 bg-[#13131d]"
+                      className="min-w-0 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-950/10"
                     >
-                      <div className="flex aspect-[2.5/3.5] items-center justify-center bg-gradient-to-br from-violet-950 to-zinc-950">
+                      <div className="flex aspect-[2.5/3.5] items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100 p-2 sm:p-3">
                         {card.imageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={card.imageUrl}
                             alt={card.card_name || "Carta da coleção"}
-                            className="h-full w-full object-contain"
+                            className="h-full w-full rounded-lg object-contain"
                           />
                         ) : (
-                          <span className="text-sm text-zinc-500">
+                          <span className="text-center text-xs font-semibold text-slate-400 sm:text-sm">
                             Sem imagem
                           </span>
                         )}
                       </div>
 
-                      <div className="p-5">
-                        <div className="flex items-start justify-between gap-3">
-                          <h3 className="font-bold">
+                      <div className="p-3 sm:p-5">
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="min-w-0 truncate text-sm font-black text-[#071a4c] sm:text-base">
                             {card.card_name || "Carta sem nome"}
                           </h3>
 
                           {basicEnergy && (
-                            <span className="rounded-full bg-blue-500/10 px-2 py-1 text-[9px] font-bold uppercase text-blue-300">
+                            <span className="shrink-0 rounded-full bg-blue-50 px-2 py-1 text-[9px] font-bold uppercase text-blue-600">
                               Básica
                             </span>
                           )}
                         </div>
 
-                        <p className="mt-1 text-sm text-zinc-400">
+                        <p className="mt-1 truncate text-xs text-slate-500 sm:text-sm">
                           {card.set_name || "Coleção não informada"}
-                          {card.card_number ? ` • ${card.card_number}` : ""}
                         </p>
 
-                        <div className="mt-3 flex justify-between text-xs text-zinc-500">
-                          <span>{card.card_condition || "Sem estado"}</span>
+                        {card.card_number && (
+                          <p className="mt-1 text-xs font-semibold text-blue-600">
+                            #{card.card_number}
+                          </p>
+                        )}
 
-                          <span>{card.quantity} disponível(is)</span>
+                        <div className="mt-3 space-y-1 text-xs text-slate-500">
+                          <p className="truncate">
+                            {card.card_condition || "Sem estado"}
+                          </p>
+
+                          <p>{card.quantity} disponível(is)</p>
                         </div>
 
                         {!basicEnergy && quantityInDeck > 0 && (
-                          <p className="mt-3 text-xs text-violet-300">
+                          <p className="mt-3 text-xs font-bold text-blue-600">
                             {quantityByName}/4 cópias no deck
                           </p>
                         )}
@@ -635,14 +677,14 @@ export function DeckBuilder({
                           onClick={() =>
                             updateCardQuantity(card, quantityInDeck + 1)
                           }
-                          className="mt-5 w-full rounded-xl bg-violet-600 px-4 py-3 font-bold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="mt-4 min-h-11 w-full rounded-xl bg-blue-600 px-2 py-3 text-xs font-black text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500 sm:px-4 sm:text-sm"
                         >
                           {saving
                             ? "Salvando..."
                             : copyLimitReached
-                              ? "Limite de 4 atingido"
+                              ? "Limite atingido"
                               : quantityInDeck > 0
-                                ? `Adicionar mais (${quantityInDeck} no deck)`
+                                ? `Adicionar (${quantityInDeck})`
                                 : "Adicionar ao deck"}
                         </button>
                       </div>

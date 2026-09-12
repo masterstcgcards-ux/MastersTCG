@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -46,73 +47,102 @@ async function ModerationContent() {
   );
 
   return (
-    <main className="min-h-screen bg-[#09090f] text-white">
-      <header className="border-b border-white/10 bg-[#0d0d16]">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-6 py-4">
-          <Link
-            href="/"
-            aria-label="MastersTCG — início"
-            className="text-xl font-black tracking-tight"
-          >
-            MASTERS<span className="text-violet-400">TCG</span>
+    <main className="min-h-screen bg-gradient-to-b from-blue-50/70 to-slate-50 text-[#071a4c]">
+      <header className="border-b border-blue-100 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-5 py-4 sm:px-6">
+          <Link href="/" aria-label="MastersTCG — início">
+            <Image
+              src="/masters-logo.png"
+              alt="MastersTCG"
+              width={260}
+              height={70}
+              priority
+              className="h-auto w-44 sm:w-52"
+            />
           </Link>
 
-          <nav className="flex flex-wrap items-center gap-5 text-sm text-zinc-400">
-            <Link href="/collection" className="hover:text-white">
+          <nav className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold text-slate-600">
+            <Link href="/collection" className="transition hover:text-blue-700">
               Minha coleção
             </Link>
 
-            <Link href="/marketplace" className="hover:text-white">
+            <Link
+              href="/marketplace"
+              className="transition hover:text-blue-700"
+            >
               Marketplace
             </Link>
 
-            <Link href="/orders" className="hover:text-white">
+            <Link href="/orders" className="transition hover:text-blue-700">
               Pedidos
             </Link>
 
-            <Link href="/auctions" className="hover:text-white">
+            <Link href="/auctions" className="transition hover:text-blue-700">
               Leilões
             </Link>
 
-            <Link href="/arena" className="hover:text-white">
+            <Link href="/arena" className="transition hover:text-blue-700">
               Arena
             </Link>
 
             <Link
               href="/moderation"
               aria-current="page"
-              className="font-semibold text-white"
+              className="font-bold text-blue-700"
             >
               Moderação
             </Link>
 
-            <Link href="/profile" className="hover:text-white">
+            <Link href="/profile" className="transition hover:text-blue-700">
               Perfil
             </Link>
           </nav>
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 py-12">
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-red-400">
-          Administração e segurança
-        </p>
+      <section className="mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-14">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#071a4c] via-blue-800 to-blue-600 px-6 py-10 text-white shadow-lg sm:px-10 sm:py-12">
+          <div
+            aria-hidden="true"
+            className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-yellow-400/25 blur-3xl"
+          />
 
-        <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
-          Moderação
-        </h1>
+          <div className="relative">
+            <span className="inline-flex rounded-full border border-yellow-300/40 bg-yellow-300/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-yellow-300">
+              Administração e segurança
+            </span>
 
-        <p className="mt-4 max-w-3xl text-zinc-400">
-          Analise denúncias, registre providências e ajude a manter as
-          negociações seguras para todos os Masters.
-        </p>
+            <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
+              Moderação
+            </h1>
+
+            <p className="mt-4 max-w-3xl leading-relaxed text-blue-100">
+              Analise denúncias, registre providências e ajude a manter as
+              negociações seguras para todos os Masters.
+            </p>
+
+            <div className="mt-7 flex flex-wrap gap-3 text-sm font-semibold">
+              <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">
+                Acesso administrativo
+              </span>
+
+              <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">
+                Proteção da comunidade
+              </span>
+            </div>
+          </div>
+        </div>
 
         {reportsError ? (
-          <div className="mt-10 rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-red-200">
-            Não foi possível carregar as denúncias: {reportsError.message}
+          <div
+            role="alert"
+            className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700"
+          >
+            <p className="font-bold">Não foi possível carregar as denúncias.</p>
+            <p className="mt-2 text-sm">{reportsError.message}</p>
           </div>
         ) : (
-          <div className="mt-10">
+          <div className="mt-8">
             <ReportsManager
               initialReports={(reportsData || []) as MarketplaceReport[]}
             />
@@ -125,12 +155,12 @@ async function ModerationContent() {
 
 function LoadingModeration() {
   return (
-    <main className="min-h-screen bg-[#09090f] px-6 py-16 text-white">
+    <main className="min-h-screen bg-gradient-to-b from-blue-50/70 to-slate-50 px-5 py-16 sm:px-6">
       <div className="mx-auto max-w-7xl">
-        <div className="h-5 w-56 animate-pulse rounded bg-white/10" />
-        <div className="mt-6 h-12 w-80 animate-pulse rounded bg-white/10" />
-        <div className="mt-10 h-48 animate-pulse rounded-2xl bg-white/5" />
-        <div className="mt-6 h-96 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-5 w-56 animate-pulse rounded bg-blue-100" />
+        <div className="mt-6 h-12 w-80 animate-pulse rounded bg-blue-100" />
+        <div className="mt-10 h-48 animate-pulse rounded-3xl bg-blue-100" />
+        <div className="mt-6 h-96 animate-pulse rounded-3xl bg-white shadow-sm" />
       </div>
     </main>
   );

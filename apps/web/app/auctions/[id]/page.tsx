@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -31,6 +32,26 @@ type RawAuction = Omit<
 type RawBid = Omit<AuctionBid, "amount"> & {
   amount: number | string;
 };
+
+function ErrorState({ message, detail }: { message: string; detail: string }) {
+  return (
+    <main className="min-h-screen bg-gradient-to-b from-blue-50/70 to-slate-50 px-5 py-16 text-[#071a4c] sm:px-6">
+      <div className="mx-auto max-w-4xl">
+        <Link
+          href="/auctions"
+          className="text-sm font-bold text-blue-700 transition hover:text-blue-800"
+        >
+          ← Voltar aos leilões
+        </Link>
+
+        <div className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700 shadow-sm">
+          <p className="font-bold">{message}</p>
+          <p className="mt-2 text-sm">{detail}</p>
+        </div>
+      </div>
+    </main>
+  );
+}
 
 async function AuctionContent({ params }: AuctionPageProps) {
   const { id } = await params;
@@ -70,20 +91,10 @@ async function AuctionContent({ params }: AuctionPageProps) {
 
   if (loadingError) {
     return (
-      <main className="min-h-screen bg-[#09090f] px-6 py-16 text-white">
-        <div className="mx-auto max-w-4xl">
-          <Link
-            href="/auctions"
-            className="text-sm font-semibold text-violet-300 hover:text-violet-200"
-          >
-            ← Voltar aos leilões
-          </Link>
-
-          <div className="mt-8 rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-red-200">
-            Não foi possível carregar o leilão: {loadingError.message}
-          </div>
-        </div>
-      </main>
+      <ErrorState
+        message="Não foi possível carregar o leilão."
+        detail={loadingError.message}
+      />
     );
   }
 
@@ -110,20 +121,10 @@ async function AuctionContent({ params }: AuctionPageProps) {
 
   if (historyError) {
     return (
-      <main className="min-h-screen bg-[#09090f] px-6 py-16 text-white">
-        <div className="mx-auto max-w-4xl">
-          <Link
-            href="/auctions"
-            className="text-sm font-semibold text-violet-300 hover:text-violet-200"
-          >
-            ← Voltar aos leilões
-          </Link>
-
-          <div className="mt-8 rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-red-200">
-            Não foi possível carregar os lances: {historyError.message}
-          </div>
-        </div>
-      </main>
+      <ErrorState
+        message="Não foi possível carregar os lances."
+        detail={historyError.message}
+      />
     );
   }
 
@@ -153,62 +154,71 @@ async function AuctionContent({ params }: AuctionPageProps) {
   );
 
   return (
-    <main className="min-h-screen bg-[#09090f] text-white">
-      <header className="border-b border-white/10 bg-[#0d0d16]">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-6 py-4">
-          <Link
-            href="/"
-            aria-label="MastersTCG — início"
-            className="text-xl font-black tracking-tight"
-          >
-            MASTERS<span className="text-violet-400">TCG</span>
+    <main className="min-h-screen bg-gradient-to-b from-blue-50/70 to-slate-50 text-[#071a4c]">
+      <header className="border-b border-blue-100 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-5 py-4 sm:px-6">
+          <Link href="/" aria-label="MastersTCG — início">
+            <Image
+              src="/masters-logo.png"
+              alt="MastersTCG"
+              width={260}
+              height={70}
+              priority
+              className="h-auto w-44 sm:w-52"
+            />
           </Link>
 
-          <nav className="flex flex-wrap items-center gap-5 text-sm text-zinc-400">
-            <Link href="/collection" className="hover:text-white">
+          <nav
+            aria-label="Navegação principal"
+            className="flex max-w-full flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold text-slate-600"
+          >
+            <Link href="/collection" className="transition hover:text-blue-700">
               Minha coleção
             </Link>
 
-            <Link href="/decks" className="hover:text-white">
+            <Link href="/decks" className="transition hover:text-blue-700">
               Meus decks
             </Link>
 
-            <Link href="/marketplace" className="hover:text-white">
+            <Link
+              href="/marketplace"
+              className="transition hover:text-blue-700"
+            >
               Marketplace
             </Link>
 
-            <Link href="/offers" className="hover:text-white">
+            <Link href="/offers" className="transition hover:text-blue-700">
               Propostas
             </Link>
 
-            <Link href="/orders" className="hover:text-white">
+            <Link href="/orders" className="transition hover:text-blue-700">
               Pedidos
             </Link>
 
-            <Link href="/auctions" className="font-semibold text-white">
+            <Link href="/auctions" className="font-bold text-blue-700">
               Leilões
             </Link>
 
-            <Link href="/arena" className="hover:text-white">
+            <Link href="/arena" className="transition hover:text-blue-700">
               Arena
             </Link>
 
-            <Link href="/profile" className="hover:text-white">
+            <Link href="/profile" className="transition hover:text-blue-700">
               Perfil
             </Link>
           </nav>
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 py-12">
+      <section className="mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-14">
         <Link
           href="/auctions"
-          className="text-sm font-semibold text-violet-300 hover:text-violet-200"
+          className="inline-flex items-center rounded-xl border border-blue-100 bg-white px-4 py-2.5 text-sm font-bold text-blue-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50"
         >
           ← Voltar aos leilões
         </Link>
 
-        <div className="mt-8">
+        <div className="mt-7">
           <AuctionDetail initialAuction={auction} initialBids={bids} />
         </div>
       </section>
@@ -218,13 +228,13 @@ async function AuctionContent({ params }: AuctionPageProps) {
 
 function LoadingAuction() {
   return (
-    <main className="min-h-screen bg-[#09090f] px-6 py-16 text-white">
+    <main className="min-h-screen bg-gradient-to-b from-blue-50/70 to-slate-50 px-5 py-16 sm:px-6">
       <div className="mx-auto max-w-7xl">
-        <div className="h-5 w-40 animate-pulse rounded bg-white/10" />
+        <div className="h-11 w-44 animate-pulse rounded-xl bg-blue-100" />
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
-          <div className="h-[650px] animate-pulse rounded-2xl bg-white/5" />
-          <div className="h-[520px] animate-pulse rounded-2xl bg-white/5" />
+        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
+          <div className="h-[650px] animate-pulse rounded-3xl bg-white shadow-sm" />
+          <div className="h-[520px] animate-pulse rounded-3xl bg-white shadow-sm" />
         </div>
       </div>
     </main>

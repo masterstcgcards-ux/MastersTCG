@@ -25,7 +25,9 @@ type CardManagerProps = {
 };
 
 const fieldClass =
-  "mt-2 w-full rounded-xl border border-white/15 bg-[#181822] px-4 py-3 text-white outline-none focus:border-violet-400";
+  "mt-2 w-full rounded-xl border border-blue-200 bg-white px-4 py-3 text-[#071a4c] outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20";
+
+const labelClass = "font-bold text-[#071a4c]";
 
 const conditionLabels: Record<string, string> = {
   mint: "Impecável (Mint)",
@@ -213,18 +215,26 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
 
   if (editing) {
     return (
-      <section className="rounded-3xl border border-white/10 bg-[#13131d] p-6 sm:p-8">
+      <section className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-6">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-violet-400">
+          <span className="inline-flex rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-amber-600">
             Editar carta
-          </p>
+          </span>
 
-          <h2 className="mt-2 text-2xl font-black">Atualize os dados</h2>
+          <h2 className="mt-4 text-2xl font-black text-[#071a4c]">
+            Atualize os dados
+          </h2>
+
+          <p className="mt-2 text-sm text-slate-500">
+            As alterações serão aplicadas somente nesta carta.
+          </p>
         </div>
 
         <form onSubmit={handleUpdate} className="space-y-5">
           <div>
-            <label htmlFor="card_name">Nome da carta *</label>
+            <label htmlFor="card_name" className={labelClass}>
+              Nome da carta *
+            </label>
 
             <input
               id="card_name"
@@ -237,7 +247,9 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
           </div>
 
           <div>
-            <label htmlFor="set_name">Coleção / expansão</label>
+            <label htmlFor="set_name" className={labelClass}>
+              Coleção / expansão
+            </label>
 
             <input
               id="set_name"
@@ -250,7 +262,9 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="card_number">Número</label>
+              <label htmlFor="card_number" className={labelClass}>
+                Número
+              </label>
 
               <input
                 id="card_number"
@@ -262,7 +276,9 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
             </div>
 
             <div>
-              <label htmlFor="quantity">Quantidade *</label>
+              <label htmlFor="quantity" className={labelClass}>
+                Quantidade *
+              </label>
 
               <input
                 id="quantity"
@@ -279,7 +295,9 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
           </div>
 
           <div>
-            <label htmlFor="card_condition">Estado de conservação *</label>
+            <label htmlFor="card_condition" className={labelClass}>
+              Estado de conservação *
+            </label>
 
             <select
               id="card_condition"
@@ -302,7 +320,9 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="language">Idioma</label>
+              <label htmlFor="language" className={labelClass}>
+                Idioma
+              </label>
 
               <select
                 id="language"
@@ -319,7 +339,9 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
             </div>
 
             <div>
-              <label htmlFor="finish">Acabamento</label>
+              <label htmlFor="finish" className={labelClass}>
+                Acabamento
+              </label>
 
               <select
                 id="finish"
@@ -336,7 +358,9 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
           </div>
 
           <div>
-            <label htmlFor="notes">Observações</label>
+            <label htmlFor="notes" className={labelClass}>
+              Observações
+            </label>
 
             <textarea
               id="notes"
@@ -351,7 +375,7 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
           {message && (
             <p
               role="alert"
-              className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200"
+              className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700"
             >
               {message}
             </p>
@@ -361,7 +385,7 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-xl bg-violet-600 px-6 py-3 font-bold text-white hover:bg-violet-500 disabled:opacity-60"
+              className="min-h-12 rounded-xl bg-blue-600 px-6 py-3 font-black text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:opacity-60"
             >
               {saving ? "Salvando..." : "Salvar alterações"}
             </button>
@@ -373,7 +397,7 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
                 setEditing(false);
                 setMessage("");
               }}
-              className="rounded-xl border border-white/15 px-6 py-3 font-bold text-zinc-300 hover:border-white/30 hover:text-white"
+              className="min-h-12 rounded-xl border border-blue-200 bg-white px-6 py-3 font-bold text-[#071a4c] transition hover:border-blue-500 hover:bg-blue-50"
             >
               Cancelar
             </button>
@@ -384,38 +408,48 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
   }
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-[#13131d] p-6 sm:p-8">
-      <p className="text-sm font-bold uppercase tracking-[0.2em] text-violet-400">
-        Dados da carta
-      </p>
+    <section className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm sm:p-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-600">
+            Dados da carta
+          </p>
 
-      <h2 className="mt-2 text-3xl font-black">
-        {card.card_name || "Carta sem nome"}
-      </h2>
+          <h2 className="mt-2 break-words text-3xl font-black text-[#071a4c]">
+            {card.card_name || "Carta sem nome"}
+          </h2>
+        </div>
 
-      <dl className="mt-8 divide-y divide-white/10">
+        <span className="rounded-full bg-amber-50 px-4 py-2 text-xs font-black text-amber-600">
+          {card.quantity ?? 1}x
+        </span>
+      </div>
+
+      <dl className="mt-8 divide-y divide-blue-100">
         <div className="grid grid-cols-2 gap-4 py-4">
-          <dt className="text-zinc-500">Coleção</dt>
-          <dd className="text-right font-semibold">
+          <dt className="text-slate-500">Coleção</dt>
+          <dd className="break-words text-right font-bold text-[#071a4c]">
             {card.set_name || "Não informada"}
           </dd>
         </div>
 
         <div className="grid grid-cols-2 gap-4 py-4">
-          <dt className="text-zinc-500">Número</dt>
-          <dd className="text-right font-semibold">
+          <dt className="text-slate-500">Número</dt>
+          <dd className="break-words text-right font-bold text-[#071a4c]">
             {card.card_number || "Não informado"}
           </dd>
         </div>
 
         <div className="grid grid-cols-2 gap-4 py-4">
-          <dt className="text-zinc-500">Quantidade</dt>
-          <dd className="text-right font-semibold">{card.quantity ?? 1}</dd>
+          <dt className="text-slate-500">Quantidade</dt>
+          <dd className="text-right font-bold text-blue-600">
+            {card.quantity ?? 1}
+          </dd>
         </div>
 
         <div className="grid grid-cols-2 gap-4 py-4">
-          <dt className="text-zinc-500">Conservação</dt>
-          <dd className="text-right font-semibold">
+          <dt className="text-slate-500">Conservação</dt>
+          <dd className="break-words text-right font-bold text-[#071a4c]">
             {card.card_condition
               ? conditionLabels[card.card_condition] || card.card_condition
               : "Não informada"}
@@ -423,8 +457,8 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
         </div>
 
         <div className="grid grid-cols-2 gap-4 py-4">
-          <dt className="text-zinc-500">Idioma</dt>
-          <dd className="text-right font-semibold">
+          <dt className="text-slate-500">Idioma</dt>
+          <dd className="text-right font-bold text-[#071a4c]">
             {card.language
               ? languageLabels[card.language] || card.language
               : "Não informado"}
@@ -432,8 +466,8 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
         </div>
 
         <div className="grid grid-cols-2 gap-4 py-4">
-          <dt className="text-zinc-500">Acabamento</dt>
-          <dd className="text-right font-semibold">
+          <dt className="text-slate-500">Acabamento</dt>
+          <dd className="text-right font-bold text-[#071a4c]">
             {card.finish
               ? finishLabels[card.finish] || card.finish
               : "Não informado"}
@@ -442,16 +476,18 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
       </dl>
 
       {card.notes && (
-        <div className="mt-6 rounded-2xl bg-white/[0.035] p-5">
-          <p className="text-sm font-bold text-zinc-400">Observações</p>
-          <p className="mt-2 whitespace-pre-wrap text-zinc-200">{card.notes}</p>
+        <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50/60 p-5">
+          <p className="text-sm font-black text-blue-600">Observações</p>
+          <p className="mt-2 whitespace-pre-wrap text-slate-700">
+            {card.notes}
+          </p>
         </div>
       )}
 
       {message && (
         <p
           role="status"
-          className="mt-6 rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-200"
+          className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 text-sm font-semibold text-green-700"
         >
           {message}
         </p>
@@ -464,7 +500,7 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
             setEditing(true);
             setMessage("");
           }}
-          className="rounded-xl bg-violet-600 px-6 py-3 font-bold text-white hover:bg-violet-500"
+          className="min-h-12 flex-1 rounded-xl bg-blue-600 px-6 py-3 font-black text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
         >
           Editar
         </button>
@@ -473,7 +509,7 @@ export function CardManager({ card: initialCard }: CardManagerProps) {
           type="button"
           disabled={deleting}
           onClick={handleDelete}
-          className="rounded-xl border border-red-500/40 px-6 py-3 font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-60"
+          className="min-h-12 rounded-xl border border-red-200 bg-white px-6 py-3 font-bold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
         >
           {deleting ? "Excluindo..." : "Excluir"}
         </button>

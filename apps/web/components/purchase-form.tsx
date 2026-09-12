@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useRef, useState, type FormEvent } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -24,6 +24,9 @@ export type PurchaseListing = {
 type PurchaseFormProps = {
   listing: PurchaseListing;
 };
+
+const fieldClass =
+  "w-full rounded-xl border border-blue-200 bg-white px-4 py-3 text-[#071a4c] outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("pt-BR", {
@@ -112,58 +115,65 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-      <article className="overflow-hidden rounded-2xl border border-white/10 bg-[#13131d]">
-        <div className="aspect-[4/3] bg-black/30">
-          {listing.front_image_url ? (
-            <img
-              src={listing.front_image_url}
-              alt={listing.card_name}
-              className="h-full w-full object-contain p-5"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center text-sm text-zinc-600">
-              Imagem não disponível
-            </div>
-          )}
+      <article className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm">
+        <div className="flex justify-center bg-gradient-to-b from-blue-50 to-white p-6">
+          <div className="flex aspect-[2.5/3.5] w-full max-w-[320px] items-center justify-center overflow-hidden rounded-2xl bg-white p-2 shadow-sm">
+            {listing.front_image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={listing.front_image_url}
+                alt={listing.card_name}
+                className="h-full w-full object-contain"
+              />
+            ) : (
+              <div className="flex h-32 w-24 flex-col items-center justify-center rounded-xl border-2 border-blue-200 bg-blue-700 text-white">
+                <span className="text-4xl font-black">M</span>
+                <span className="mt-1 text-[10px] font-bold tracking-widest text-yellow-300">
+                  TCG
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="p-6">
-          <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-300">
+        <div className="border-t border-blue-100 p-6">
+          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-emerald-700">
             Venda
           </span>
 
-          <h2 className="mt-4 break-words text-2xl font-black">
+          <h2 className="mt-4 break-words text-2xl font-black text-[#071a4c]">
             {listing.title}
           </h2>
 
-          <p className="mt-2 text-lg font-bold text-white">
+          <p className="mt-2 text-lg font-bold text-slate-700">
             {listing.card_name}
           </p>
 
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-slate-500">
             {listing.set_name || "Coleção não informada"}
             {listing.card_number ? ` · ${listing.card_number}` : ""}
           </p>
 
-          <div className="mt-6 border-t border-white/10 pt-5">
-            <p className="text-3xl font-black text-emerald-400">
+          <div className="mt-6 border-t border-blue-100 pt-5">
+            <p className="text-3xl font-black text-emerald-600">
               {formatCurrency(Number(listing.price))}
             </p>
-            <p className="mt-1 text-sm text-zinc-500">por unidade</p>
+
+            <p className="mt-1 text-sm text-slate-500">por unidade</p>
           </div>
 
           <dl className="mt-6 grid gap-4 text-sm sm:grid-cols-2">
             <div>
-              <dt className="text-zinc-500">Disponível</dt>
-              <dd className="mt-1 font-semibold">
+              <dt className="text-slate-500">Disponível</dt>
+              <dd className="mt-1 font-semibold text-[#071a4c]">
                 {listing.quantity}{" "}
                 {listing.quantity === 1 ? "unidade" : "unidades"}
               </dd>
             </div>
 
             <div>
-              <dt className="text-zinc-500">Vendedor</dt>
-              <dd className="mt-1 break-words font-semibold">
+              <dt className="text-slate-500">Vendedor</dt>
+              <dd className="mt-1 break-words font-semibold text-[#071a4c]">
                 {listing.seller_display_name ||
                   listing.seller_username ||
                   "Master"}
@@ -171,16 +181,16 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
             </div>
 
             <div>
-              <dt className="text-zinc-500">Localização</dt>
-              <dd className="mt-1 font-semibold">
+              <dt className="text-slate-500">Localização</dt>
+              <dd className="mt-1 font-semibold text-[#071a4c]">
                 {[listing.city, listing.state].filter(Boolean).join(" - ") ||
                   "Não informada"}
               </dd>
             </div>
 
             <div>
-              <dt className="text-zinc-500">Envio</dt>
-              <dd className="mt-1 font-semibold">
+              <dt className="text-slate-500">Envio</dt>
+              <dd className="mt-1 font-semibold text-[#071a4c]">
                 {listing.shipping_available
                   ? "Disponível"
                   : "A combinar com o vendedor"}
@@ -192,16 +202,18 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border border-white/10 bg-[#13131d] p-6 sm:p-8"
+        className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm sm:p-8"
       >
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] text-violet-400">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
             Resumo da compra
           </p>
 
-          <h2 className="mt-3 text-2xl font-black">Criar pedido</h2>
+          <h2 className="mt-3 text-2xl font-black text-[#071a4c]">
+            Criar pedido
+          </h2>
 
-          <p className="mt-2 text-sm leading-6 text-zinc-400">
+          <p className="mt-2 text-sm leading-6 text-slate-600">
             O vendedor receberá o pedido e deverá confirmar a disponibilidade. O
             pagamento será combinado diretamente entre vocês.
           </p>
@@ -210,7 +222,7 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
         <div className="mt-8">
           <label
             htmlFor="quantity"
-            className="mb-2 block text-sm font-semibold"
+            className="mb-2 block text-sm font-semibold text-[#071a4c]"
           >
             Quantidade
           </label>
@@ -224,19 +236,20 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
             value={quantity}
             onChange={(event) => {
               const nextQuantity = Number(event.target.value);
+
               setQuantity(
                 Math.max(1, Math.min(listing.quantity, nextQuantity || 1)),
               );
             }}
             required
-            className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none transition focus:border-violet-500"
+            className={fieldClass}
           />
         </div>
 
         <div className="mt-6">
           <label
             htmlFor="delivery_method"
-            className="mb-2 block text-sm font-semibold"
+            className="mb-2 block text-sm font-semibold text-[#071a4c]"
           >
             Forma de entrega
           </label>
@@ -246,7 +259,7 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
             name="delivery_method"
             value={deliveryMethod}
             onChange={(event) => setDeliveryMethod(event.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-[#0d0d16] px-4 py-3 outline-none transition focus:border-violet-500"
+            className={fieldClass}
           >
             <option value="arranged">Combinar com o vendedor</option>
             <option value="pickup">Retirada em mãos</option>
@@ -258,8 +271,8 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
         </div>
 
         {deliveryMethod === "shipping" && (
-          <fieldset className="mt-8 rounded-2xl border border-violet-500/20 bg-violet-500/5 p-5">
-            <legend className="px-2 text-sm font-bold text-violet-300">
+          <fieldset className="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-5">
+            <legend className="px-2 text-sm font-bold text-blue-700">
               Endereço de entrega
             </legend>
 
@@ -267,27 +280,29 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
               <div className="sm:col-span-2">
                 <label
                   htmlFor="recipient_name"
-                  className="mb-2 block text-sm font-semibold"
+                  className="mb-2 block text-sm font-semibold text-[#071a4c]"
                 >
                   Nome do destinatário
                 </label>
+
                 <input
                   id="recipient_name"
                   name="recipient_name"
                   type="text"
                   maxLength={120}
                   required
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
+                  className={fieldClass}
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="postal_code"
-                  className="mb-2 block text-sm font-semibold"
+                  className="mb-2 block text-sm font-semibold text-[#071a4c]"
                 >
                   CEP
                 </label>
+
                 <input
                   id="postal_code"
                   name="postal_code"
@@ -295,17 +310,18 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
                   maxLength={12}
                   placeholder="00000-000"
                   required
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
+                  className={fieldClass}
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="state"
-                  className="mb-2 block text-sm font-semibold"
+                  className="mb-2 block text-sm font-semibold text-[#071a4c]"
                 >
                   Estado
                 </label>
+
                 <input
                   id="state"
                   name="state"
@@ -313,90 +329,95 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
                   maxLength={2}
                   placeholder="SP"
                   required
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 uppercase outline-none focus:border-violet-500"
+                  className={`${fieldClass} uppercase`}
                 />
               </div>
 
               <div className="sm:col-span-2">
                 <label
                   htmlFor="address_line"
-                  className="mb-2 block text-sm font-semibold"
+                  className="mb-2 block text-sm font-semibold text-[#071a4c]"
                 >
                   Rua ou avenida
                 </label>
+
                 <input
                   id="address_line"
                   name="address_line"
                   type="text"
                   maxLength={180}
                   required
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
+                  className={fieldClass}
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="address_number"
-                  className="mb-2 block text-sm font-semibold"
+                  className="mb-2 block text-sm font-semibold text-[#071a4c]"
                 >
                   Número
                 </label>
+
                 <input
                   id="address_number"
                   name="address_number"
                   type="text"
                   maxLength={20}
                   required
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
+                  className={fieldClass}
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="address_complement"
-                  className="mb-2 block text-sm font-semibold"
+                  className="mb-2 block text-sm font-semibold text-[#071a4c]"
                 >
                   Complemento
                 </label>
+
                 <input
                   id="address_complement"
                   name="address_complement"
                   type="text"
                   maxLength={100}
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
+                  className={fieldClass}
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="neighborhood"
-                  className="mb-2 block text-sm font-semibold"
+                  className="mb-2 block text-sm font-semibold text-[#071a4c]"
                 >
                   Bairro
                 </label>
+
                 <input
                   id="neighborhood"
                   name="neighborhood"
                   type="text"
                   maxLength={100}
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
+                  className={fieldClass}
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="city"
-                  className="mb-2 block text-sm font-semibold"
+                  className="mb-2 block text-sm font-semibold text-[#071a4c]"
                 >
                   Cidade
                 </label>
+
                 <input
                   id="city"
                   name="city"
                   type="text"
                   maxLength={120}
                   required
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-violet-500"
+                  className={fieldClass}
                 />
               </div>
             </div>
@@ -406,7 +427,7 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
         <div className="mt-6">
           <label
             htmlFor="buyer_notes"
-            className="mb-2 block text-sm font-semibold"
+            className="mb-2 block text-sm font-semibold text-[#071a4c]"
           >
             Mensagem para o vendedor
           </label>
@@ -417,20 +438,20 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
             rows={4}
             maxLength={500}
             placeholder="Ex.: Posso retirar no fim de semana."
-            className="w-full resize-none rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none transition focus:border-violet-500"
+            className={`${fieldClass} resize-none`}
           />
         </div>
 
-        <div className="mt-8 rounded-2xl border border-white/10 bg-black/20 p-5">
+        <div className="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-5">
           <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-zinc-400">
+            <span className="text-sm text-slate-600">
               {quantity} × {formatCurrency(Number(listing.price))}
             </span>
 
-            <span className="text-sm font-semibold text-zinc-300">Total</span>
+            <span className="text-sm font-semibold text-[#071a4c]">Total</span>
           </div>
 
-          <p className="mt-2 text-right text-3xl font-black text-emerald-400">
+          <p className="mt-2 text-right text-3xl font-black text-emerald-600">
             {formatCurrency(total)}
           </p>
         </div>
@@ -438,7 +459,7 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
         {error && (
           <div
             role="alert"
-            className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200"
+            className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
           >
             {error}
           </div>
@@ -447,12 +468,12 @@ export function PurchaseForm({ listing }: PurchaseFormProps) {
         <button
           type="submit"
           disabled={submitting}
-          className="mt-6 w-full rounded-xl bg-violet-600 px-5 py-4 text-sm font-black text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-6 w-full rounded-xl bg-yellow-400 px-5 py-4 text-sm font-black text-[#071a4c] shadow-sm transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting ? "Criando pedido..." : "Confirmar pedido"}
         </button>
 
-        <p className="mt-4 text-center text-xs leading-5 text-zinc-500">
+        <p className="mt-4 text-center text-xs leading-5 text-slate-500">
           O MastersTCG não processa o pagamento nesta etapa. Combine pagamento,
           entrega e conferência da carta diretamente com o vendedor.
         </p>

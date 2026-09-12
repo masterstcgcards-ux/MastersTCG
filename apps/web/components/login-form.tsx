@@ -1,20 +1,14 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 
 export function LoginForm({
   className,
@@ -24,87 +18,138 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (isLoading) {
+      return;
+    }
+
     const supabase = createClient();
+
     setIsLoading(true);
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error: loginError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
+
+      if (loginError) {
+        throw loginError;
+      }
+
       router.push("/protected");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      router.refresh();
+    } catch (loginError: unknown) {
+      setError(
+        loginError instanceof Error
+          ? loginError.message
+          : "Não foi possível entrar na sua conta.",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/auth/sign-up"
-                className="underline underline-offset-4"
+    <div className={cn("flex flex-col", className)} {...props}>
+      <div>
+        <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
+          Bem-vindo de volta
+        </span>
+
+        <h2 className="mt-5 text-3xl font-black tracking-tight text-[#071a4c] sm:text-4xl">
+          Entre na sua conta
+        </h2>
+
+        <p className="mt-3 leading-relaxed text-slate-600">
+          Acesse sua coleção, seus decks e todas as áreas do MastersTCG.
+        </p>
+      </div>
+
+      <form onSubmit={handleLogin} className="mt-8">
+        <div className="flex flex-col gap-5">
+          <div>
+            <Label htmlFor="email" className="text-sm font-bold text-slate-700">
+              E-mail
+            </Label>
+
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder="seuemail@exemplo.com"
+              required
+              value={email}
+              disabled={isLoading}
+              onChange={(event) => setEmail(event.target.value)}
+              className="mt-2 h-12 rounded-xl border-blue-100 bg-white px-4 text-[#071a4c] shadow-none placeholder:text-slate-400 focus-visible:border-blue-600 focus-visible:ring-blue-600/20"
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between gap-4">
+              <Label
+                htmlFor="password"
+                className="text-sm font-bold text-slate-700"
               >
-                Sign up
+                Senha
+              </Label>
+
+              <Link
+                href="/auth/forgot-password"
+                className="text-sm font-semibold text-blue-700 transition hover:text-blue-600 hover:underline"
+              >
+                Esqueci minha senha
               </Link>
             </div>
-          </form>
-        </CardContent>
-      </Card>
+
+            <Input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              required
+              value={password}
+              disabled={isLoading}
+              onChange={(event) => setPassword(event.target.value)}
+              className="mt-2 h-12 rounded-xl border-blue-100 bg-white px-4 text-[#071a4c] shadow-none focus-visible:border-blue-600 focus-visible:ring-blue-600/20"
+            />
+          </div>
+
+          {error && (
+            <div
+              role="alert"
+              className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-relaxed text-red-700"
+            >
+              Não foi possível entrar. Confira seu e-mail e sua senha e tente
+              novamente.
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="h-12 w-full rounded-xl bg-blue-700 text-base font-bold text-white shadow-md shadow-blue-200 transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isLoading ? "Entrando..." : "Entrar"}
+          </Button>
+        </div>
+
+        <div className="mt-6 border-t border-blue-100 pt-6 text-center text-sm text-slate-600">
+          Ainda não possui uma conta?{" "}
+          <Link
+            href="/auth/sign-up"
+            className="font-bold text-blue-700 transition hover:text-blue-600 hover:underline"
+          >
+            Criar minha conta
+          </Link>
+        </div>
+      </form>
     </div>
   );
 }

@@ -29,6 +29,13 @@ const statusLabels: Record<string, string> = {
   cancelled: "Cancelada",
 };
 
+const statusStyles: Record<string, string> = {
+  pending: "border-amber-200 bg-amber-50 text-amber-800",
+  confirmed: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  rejected: "border-red-200 bg-red-50 text-red-700",
+  cancelled: "border-slate-200 bg-slate-50 text-slate-600",
+};
+
 export function TournamentRegistration({
   tournamentId,
   tournamentFormat,
@@ -172,14 +179,18 @@ export function TournamentRegistration({
   }
 
   const containerClass =
-    "mt-6 rounded-xl border border-white/10 bg-black/20 p-4";
+    "mt-6 rounded-2xl border border-blue-100 bg-blue-50/50 p-4 sm:p-5";
 
   if (loading) {
     return (
       <div className={containerClass}>
-        <p role="status" className="text-sm text-zinc-400">
-          Consultando sua inscrição...
-        </p>
+        <div className="flex items-center gap-3">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-100 border-t-blue-600" />
+
+          <p role="status" className="text-sm font-semibold text-slate-600">
+            Consultando sua inscrição...
+          </p>
+        </div>
       </div>
     );
   }
@@ -187,13 +198,13 @@ export function TournamentRegistration({
   if (needsLogin) {
     return (
       <div className={containerClass}>
-        <p className="text-sm text-zinc-300">
+        <p className="text-sm text-slate-600">
           Entre na sua conta para consultar ou fazer uma inscrição.
         </p>
 
         <Link
           href="/auth/login"
-          className="mt-3 inline-block font-semibold text-violet-300"
+          className="mt-4 inline-flex rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700"
         >
           Entrar
         </Link>
@@ -203,15 +214,15 @@ export function TournamentRegistration({
 
   if (loadError) {
     return (
-      <div className={containerClass}>
-        <p role="alert" className="text-sm text-red-300">
+      <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 sm:p-5">
+        <p role="alert" className="text-sm font-semibold text-red-700">
           {loadError}
         </p>
 
         <button
           type="button"
           onClick={() => setReloadKey((current) => current + 1)}
-          className="mt-3 text-sm font-semibold text-violet-300"
+          className="mt-4 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-bold text-red-700 transition hover:bg-red-100"
         >
           Tentar novamente
         </button>
@@ -222,24 +233,37 @@ export function TournamentRegistration({
   if (registration) {
     return (
       <div className={containerClass}>
-        <h4 className="font-bold">Sua inscrição</h4>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h4 className="font-black text-[#071a4c]">Sua inscrição</h4>
 
-        <p role="status" className="mt-2 text-sm text-violet-300">
-          {statusLabels[registration.status] || registration.status}
-        </p>
+          <span
+            className={`rounded-full border px-3 py-1 text-xs font-bold ${
+              statusStyles[registration.status] ||
+              "border-blue-200 bg-blue-50 text-blue-700"
+            }`}
+          >
+            {statusLabels[registration.status] || registration.status}
+          </span>
+        </div>
 
-        <p className="mt-2 break-words text-sm text-zinc-300">
-          Deck: {registration.deck_name}
-        </p>
+        <div className="mt-4 rounded-xl border border-blue-100 bg-white p-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Deck enviado
+          </p>
+
+          <p className="mt-1 break-words font-bold text-[#071a4c]">
+            {registration.deck_name}
+          </p>
+        </div>
 
         {registration.status === "pending" && (
-          <p className="mt-3 text-xs text-zinc-400">
+          <p className="mt-4 text-xs leading-relaxed text-amber-800">
             Sua lista foi registrada e aguarda revisão. A inscrição ainda não
             representa aprovação para participar.
           </p>
         )}
 
-        <p className="mt-3 text-xs text-zinc-500">
+        <p className="mt-3 text-xs leading-relaxed text-slate-500">
           Alterações posteriores no deck não modificam a lista enviada nesta
           inscrição.
         </p>
@@ -247,7 +271,7 @@ export function TournamentRegistration({
         <button
           type="button"
           onClick={() => setReloadKey((current) => current + 1)}
-          className="mt-3 text-xs font-semibold text-violet-300"
+          className="mt-4 text-xs font-bold text-blue-700 transition hover:text-blue-800"
         >
           Atualizar status
         </button>
@@ -258,16 +282,16 @@ export function TournamentRegistration({
   if (decks.length === 0) {
     return (
       <div className={containerClass}>
-        <h4 className="font-bold">Inscrição</h4>
+        <h4 className="font-black text-[#071a4c]">Inscrição</h4>
 
-        <p className="mt-2 text-sm text-zinc-400">
+        <p className="mt-2 text-sm leading-relaxed text-slate-600">
           Você ainda não possui um deck Pokémon com o mesmo formato deste
           torneio.
         </p>
 
         <Link
           href="/decks"
-          className="mt-3 inline-block text-sm font-semibold text-violet-300"
+          className="mt-4 inline-flex rounded-xl border border-blue-200 bg-white px-4 py-2.5 text-sm font-bold text-blue-700 transition hover:bg-blue-50"
         >
           Ir para meus decks
         </Link>
@@ -277,16 +301,20 @@ export function TournamentRegistration({
 
   return (
     <div className={containerClass}>
-      <h4 className="font-bold">Inscrever meu deck</h4>
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 font-black text-white">
+        ✓
+      </div>
 
-      <p className="mt-2 text-sm text-zinc-400">
+      <h4 className="mt-4 font-black text-[#071a4c]">Inscrever meu deck</h4>
+
+      <p className="mt-2 text-sm leading-relaxed text-slate-600">
         Escolha um deck do formato deste torneio. Ele precisa ter exatamente 60
         cartas e será submetido à revisão.
       </p>
 
       <label
         htmlFor={`registration-deck-${tournamentId}`}
-        className="mt-4 block text-sm font-semibold"
+        className="mt-4 block text-sm font-bold text-[#071a4c]"
       >
         Meu deck
       </label>
@@ -299,7 +327,7 @@ export function TournamentRegistration({
           setSelectedDeckId(event.target.value);
           setSubmitError("");
         }}
-        className="mt-2 block w-full rounded-xl border border-white/15 bg-[#171721] px-4 py-3 text-white outline-none focus:border-violet-500 disabled:opacity-50"
+        className="mt-2 block w-full rounded-xl border border-blue-100 bg-white px-4 py-3 text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 disabled:opacity-50"
       >
         <option value="">Selecione um deck</option>
 
@@ -310,14 +338,14 @@ export function TournamentRegistration({
         ))}
       </select>
 
-      <p className="mt-3 text-xs text-zinc-500">
+      <p className="mt-3 text-xs leading-relaxed text-slate-500">
         Ao enviar, você compartilha a lista de cartas com a organização do
         torneio. Suas fotos privadas e observações pessoais não serão incluídas.
       </p>
 
       {submitError && (
-        <div className="mt-4">
-          <p role="alert" className="text-sm text-red-300">
+        <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+          <p role="alert" className="text-sm font-semibold text-red-700">
             {submitError}
           </p>
 
@@ -325,7 +353,7 @@ export function TournamentRegistration({
             type="button"
             disabled={saving}
             onClick={() => setReloadKey((current) => current + 1)}
-            className="mt-2 text-sm font-semibold text-violet-300 disabled:opacity-50"
+            className="mt-3 text-sm font-bold text-red-700 disabled:opacity-50"
           >
             Consultar inscrição
           </button>
@@ -336,7 +364,7 @@ export function TournamentRegistration({
         type="button"
         disabled={saving || !selectedDeckId}
         onClick={handleRegister}
-        className="mt-4 w-full rounded-xl bg-violet-600 px-5 py-3 font-bold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-5 w-full rounded-xl bg-blue-600 px-5 py-3 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {saving ? "Enviando inscrição..." : "Enviar inscrição"}
       </button>

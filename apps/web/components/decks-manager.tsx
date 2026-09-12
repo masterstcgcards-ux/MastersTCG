@@ -1,6 +1,6 @@
 "use client";
-import Link from "next/link";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -23,7 +23,9 @@ type DecksManagerProps = {
 };
 
 const fieldClass =
-  "mt-2 w-full rounded-xl border border-white/15 bg-[#181822] px-4 py-3 text-white outline-none transition focus:border-violet-400";
+  "mt-2 w-full rounded-xl border border-blue-200 bg-white px-4 py-3 text-[#071a4c] outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20";
+
+const labelClass = "font-bold text-[#071a4c]";
 
 export function DecksManager({ initialDecks }: DecksManagerProps) {
   const router = useRouter();
@@ -93,7 +95,7 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
             description,
             is_public,
             created_at
-            `,
+          `,
         )
         .single();
 
@@ -188,9 +190,13 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
 
   return (
     <div>
-      <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="mb-8 flex flex-col justify-between gap-4 rounded-3xl border border-blue-100 bg-white p-5 shadow-sm sm:flex-row sm:items-center">
         <div>
-          <p className="text-zinc-400">
+          <p className="text-sm font-semibold text-slate-500">
+            Sua área de estratégias
+          </p>
+
+          <p className="mt-1 text-xl font-black text-[#071a4c]">
             {decks.length}{" "}
             {decks.length === 1 ? "deck cadastrado" : "decks cadastrados"}
           </p>
@@ -202,26 +208,39 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
             setShowForm((currentValue) => !currentValue);
             setMessage("");
           }}
-          className="rounded-xl bg-violet-600 px-6 py-3 font-bold text-white hover:bg-violet-500"
+          className={`min-h-12 rounded-xl px-6 py-3 font-black transition ${
+            showForm
+              ? "border border-blue-200 bg-white text-[#071a4c] hover:bg-blue-50"
+              : "bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700"
+          }`}
         >
-          {showForm ? "Cancelar" : "Criar novo deck"}
+          {showForm ? "Cancelar" : "+ Criar novo deck"}
         </button>
       </div>
 
       {showForm && (
-        <section className="mb-8 rounded-3xl border border-violet-500/30 bg-[#13131d] p-6 sm:p-8">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-violet-400">
+        <section className="mb-8 rounded-3xl border border-blue-200 bg-white p-6 shadow-xl shadow-blue-950/5 sm:p-8">
+          <span className="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-amber-600">
+            <span aria-hidden="true">✦</span>
             Novo deck
-          </p>
+          </span>
 
-          <h2 className="mt-2 text-2xl font-black">Monte sua estratégia</h2>
+          <h2 className="mt-5 text-2xl font-black text-[#071a4c]">
+            Monte sua estratégia
+          </h2>
+
+          <p className="mt-2 text-slate-500">
+            Crie o deck e depois escolha as cartas da sua coleção.
+          </p>
 
           <form
             onSubmit={handleCreateDeck}
             className="mt-7 grid gap-5 md:grid-cols-2"
           >
             <div>
-              <label htmlFor="name">Nome do deck *</label>
+              <label htmlFor="name" className={labelClass}>
+                Nome do deck *
+              </label>
 
               <input
                 id="name"
@@ -235,7 +254,9 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
             </div>
 
             <div>
-              <label htmlFor="format">Formato</label>
+              <label htmlFor="format" className={labelClass}>
+                Formato
+              </label>
 
               <select
                 id="format"
@@ -251,7 +272,9 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
             </div>
 
             <div className="md:col-span-2">
-              <label htmlFor="description">Descrição</label>
+              <label htmlFor="description" className={labelClass}>
+                Descrição
+              </label>
 
               <textarea
                 id="description"
@@ -262,19 +285,30 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
                 className={fieldClass}
               />
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/[0.025] p-4 md:col-span-2">
-              <span className="block font-semibold">Deck privado</span>
 
-              <span className="text-sm text-zinc-500">
-                Seu deck e as cartas adicionadas ficam visíveis apenas para
-                você.
-              </span>
+            <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-5 md:col-span-2">
+              <div className="flex items-start gap-4">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-xl text-blue-600">
+                  ◆
+                </span>
+
+                <div>
+                  <span className="block font-black text-[#071a4c]">
+                    Deck privado
+                  </span>
+
+                  <span className="mt-1 block text-sm leading-relaxed text-slate-500">
+                    Seu deck e as cartas adicionadas ficam visíveis apenas para
+                    você.
+                  </span>
+                </div>
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={saving}
-              className="rounded-xl bg-violet-600 px-6 py-3 font-bold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2"
+              className="min-h-12 rounded-xl bg-blue-600 px-6 py-3 font-black text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2"
             >
               {saving ? "Criando deck..." : "Criar deck"}
             </button>
@@ -285,10 +319,10 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
       {message && (
         <p
           role={success ? "status" : "alert"}
-          className={`mb-8 rounded-xl border p-4 text-sm ${
+          className={`mb-8 rounded-xl border p-4 text-sm font-semibold ${
             success
-              ? "border-green-500/30 bg-green-500/10 text-green-200"
-              : "border-red-500/30 bg-red-500/10 text-red-200"
+              ? "border-green-200 bg-green-50 text-green-700"
+              : "border-red-200 bg-red-50 text-red-700"
           }`}
         >
           {message}
@@ -296,16 +330,16 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
       )}
 
       {decks.length === 0 ? (
-        <section className="flex min-h-96 flex-col items-center justify-center rounded-3xl border border-dashed border-white/15 bg-white/[0.025] p-8 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-violet-500/10 text-4xl">
+        <section className="flex min-h-96 flex-col items-center justify-center rounded-3xl border border-dashed border-blue-200 bg-white p-8 text-center shadow-sm">
+          <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-50 text-4xl text-blue-600">
             ◫
           </div>
 
-          <h2 className="mt-6 text-2xl font-bold">
+          <h2 className="mt-6 text-2xl font-black text-[#071a4c]">
             Seu primeiro deck começa aqui
           </h2>
 
-          <p className="mt-3 max-w-md text-zinc-400">
+          <p className="mt-3 max-w-md leading-relaxed text-slate-600">
             Crie um deck Pokémon e depois escolha quais cartas da sua coleção
             farão parte dele.
           </p>
@@ -313,7 +347,7 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="mt-7 rounded-xl bg-violet-600 px-6 py-3 font-bold text-white hover:bg-violet-500"
+            className="mt-7 min-h-12 rounded-xl bg-blue-600 px-6 py-3 font-black text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
           >
             Criar primeiro deck
           </button>
@@ -323,69 +357,78 @@ export function DecksManager({ initialDecks }: DecksManagerProps) {
           {decks.map((deck) => (
             <article
               key={deck.id}
-              className="rounded-3xl border border-white/10 bg-[#13131d] p-6"
+              className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-950/10"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-600 text-2xl font-black">
-                  M
+              <div className="h-2 bg-gradient-to-r from-blue-600 via-blue-500 to-amber-400" />
+
+              <div className="p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#071a4c] text-2xl font-black text-white shadow-lg shadow-blue-950/20">
+                    M
+                  </div>
+
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-bold ${
+                      deck.is_public
+                        ? "bg-green-50 text-green-700"
+                        : "bg-slate-100 text-slate-500"
+                    }`}
+                  >
+                    {deck.is_public ? "Público" : "Privado"}
+                  </span>
                 </div>
 
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                    deck.is_public
-                      ? "bg-green-500/10 text-green-300"
-                      : "bg-zinc-500/10 text-zinc-400"
-                  }`}
-                >
-                  {deck.is_public ? "Público" : "Privado"}
-                </span>
-              </div>
-
-              <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-violet-400">
-                Pokémon TCG
-              </p>
-
-              <h2 className="mt-2 text-2xl font-black">{deck.name}</h2>
-
-              <p className="mt-2 text-sm text-zinc-400">
-                {deck.format
-                  ? `Formato: ${deck.format}`
-                  : "Formato não informado"}
-              </p>
-
-              {deck.description && (
-                <p className="mt-4 line-clamp-3 text-sm text-zinc-300">
-                  {deck.description}
+                <p className="mt-6 text-xs font-black uppercase tracking-[0.2em] text-blue-600">
+                  Pokémon TCG
                 </p>
-              )}
 
-              <div className="mt-6 border-t border-white/10 pt-5">
-                <p className="font-semibold">
-                  {deck.cardCount} {deck.cardCount === 1 ? "carta" : "cartas"}{" "}
-                  no deck
+                <h2 className="mt-2 break-words text-2xl font-black text-[#071a4c]">
+                  {deck.name}
+                </h2>
+
+                <p className="mt-2 text-sm font-semibold text-slate-500">
+                  {deck.format
+                    ? `Formato: ${deck.format}`
+                    : "Formato não informado"}
+                </p>
+
+                {deck.description && (
+                  <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-slate-600">
+                    {deck.description}
+                  </p>
+                )}
+
+                <div className="mt-6 rounded-2xl bg-blue-50/70 p-4">
+                  <p className="font-black text-[#071a4c]">
+                    <span className="text-2xl text-blue-600">
+                      {deck.cardCount}
+                    </span>{" "}
+                    {deck.cardCount === 1 ? "carta" : "cartas"} no deck
+                  </p>
+                </div>
+
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    href={`/decks/${deck.id}`}
+                    className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-black text-white transition hover:bg-blue-700"
+                  >
+                    Montar deck
+                  </Link>
+
+                  <button
+                    type="button"
+                    disabled={deletingId === deck.id}
+                    onClick={() => handleDeleteDeck(deck)}
+                    className="rounded-xl border border-red-200 bg-white px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+                  >
+                    {deletingId === deck.id ? "Excluindo..." : "Excluir"}
+                  </button>
+                </div>
+
+                <p className="mt-3 text-xs leading-relaxed text-slate-400">
+                  Abra o deck para adicionar, remover e organizar suas cartas.
                 </p>
               </div>
-
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href={`/decks/${deck.id}`}
-                  className="flex-1 rounded-xl bg-violet-600 px-4 py-3 text-center text-sm font-bold text-white hover:bg-violet-500"
-                >
-                  Montar deck
-                </Link>
-                <button
-                  type="button"
-                  disabled={deletingId === deck.id}
-                  onClick={() => handleDeleteDeck(deck)}
-                  className="rounded-xl border border-red-500/40 px-4 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10 disabled:opacity-60"
-                >
-                  {deletingId === deck.id ? "Excluindo..." : "Excluir"}
-                </button>
-              </div>
-
-              <p className="mt-3 text-xs text-zinc-600">
-                Abra o deck para adicionar, remover e organizar suas cartas.
-              </p>
             </article>
           ))}
         </div>

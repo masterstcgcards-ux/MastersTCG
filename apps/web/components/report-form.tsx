@@ -73,7 +73,10 @@ export function ReportForm({
 
   if (submitted) {
     return (
-      <div className="mt-5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-200">
+      <div
+        role="status"
+        className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700"
+      >
         Denúncia enviada para análise da equipe MastersTCG.
       </div>
     );
@@ -87,7 +90,7 @@ export function ReportForm({
           setOpen((current) => !current);
           setError("");
         }}
-        className="text-sm font-semibold text-red-300 underline-offset-4 hover:text-red-200 hover:underline"
+        className="text-sm font-bold text-red-600 underline-offset-4 transition hover:text-red-700 hover:underline"
       >
         {open ? "Fechar denúncia" : `Denunciar ${targetLabel}`}
       </button>
@@ -95,75 +98,79 @@ export function ReportForm({
       {open && (
         <form
           onSubmit={handleSubmit}
-          className="mt-4 rounded-xl border border-red-500/20 bg-red-500/5 p-5"
+          className="mt-4 overflow-hidden rounded-2xl border border-red-200 bg-white"
         >
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-300">
-            Central de segurança
-          </p>
+          <div className="border-b border-red-100 bg-red-50 p-5">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-red-600">
+              Central de segurança
+            </p>
 
-          <p className="mt-2 text-sm leading-6 text-zinc-300">
-            Envie apenas denúncias verdadeiras e descreva o problema com
-            clareza. A equipe administrativa fará a análise.
-          </p>
-
-          <div className="mt-5">
-            <label
-              htmlFor={`report-reason-${targetType}-${targetId}`}
-              className="mb-2 block text-sm font-semibold"
-            >
-              Motivo
-            </label>
-
-            <select
-              id={`report-reason-${targetType}-${targetId}`}
-              name="reason"
-              defaultValue="misleading_information"
-              className="w-full rounded-xl border border-white/10 bg-[#0d0d16] px-4 py-3 outline-none focus:border-red-400"
-            >
-              {Object.entries(reasonLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Envie apenas denúncias verdadeiras e descreva o problema com
+              clareza. A equipe administrativa fará a análise.
+            </p>
           </div>
 
-          <div className="mt-5">
-            <label
-              htmlFor={`report-details-${targetType}-${targetId}`}
-              className="mb-2 block text-sm font-semibold"
-            >
-              Explique o ocorrido
-            </label>
+          <div className="p-5">
+            <div>
+              <label
+                htmlFor={`report-reason-${targetType}-${targetId}`}
+                className="mb-2 block text-sm font-bold text-[#071a4c]"
+              >
+                Motivo
+              </label>
 
-            <textarea
-              id={`report-details-${targetType}-${targetId}`}
-              name="details"
-              rows={5}
-              minLength={10}
-              maxLength={2000}
-              placeholder="Descreva o problema e informe os detalhes necessários para a análise."
-              required
-              className="w-full resize-none rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-red-400"
-            />
-          </div>
-
-          {error && (
-            <div
-              role="alert"
-              className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200"
-            >
-              {error}
+              <select
+                id={`report-reason-${targetType}-${targetId}`}
+                name="reason"
+                defaultValue="misleading_information"
+                className="w-full rounded-xl border border-red-100 bg-white px-4 py-3 text-slate-700 outline-none transition focus:border-red-400 focus:ring-4 focus:ring-red-100"
+              >
+                {Object.entries(reasonLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="mt-5 rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white hover:bg-red-500 disabled:opacity-50"
-          >
-            {submitting ? "Enviando..." : "Enviar denúncia"}
-          </button>
+            <div className="mt-5">
+              <label
+                htmlFor={`report-details-${targetType}-${targetId}`}
+                className="mb-2 block text-sm font-bold text-[#071a4c]"
+              >
+                Explique o ocorrido
+              </label>
+
+              <textarea
+                id={`report-details-${targetType}-${targetId}`}
+                name="details"
+                rows={5}
+                minLength={10}
+                maxLength={2000}
+                placeholder="Descreva o problema e informe os detalhes necessários para a análise."
+                required
+                className="w-full resize-none rounded-xl border border-red-100 bg-white px-4 py-3 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-red-400 focus:ring-4 focus:ring-red-100"
+              />
+            </div>
+
+            {error && (
+              <div
+                role="alert"
+                className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700"
+              >
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-5 rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {submitting ? "Enviando..." : "Enviar denúncia"}
+            </button>
+          </div>
         </form>
       )}
     </div>
