@@ -7,6 +7,7 @@ import type { FormEvent } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 import { CardCameraScanner } from "@/components/card-camera-scanner";
+import { recognizePokemonCard } from "@/lib/card-ocr";
 
 const fieldClass =
   "mt-2 w-full rounded-xl border border-blue-200 bg-white px-4 py-3 text-[#071a4c] outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20";
@@ -38,6 +39,15 @@ export default function ScanPage() {
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
   const submitting = useRef(false);
+  const analysisRun = useRef(0);
+
+  const [cardName, setCardName] = useState("");
+  const [setName, setSetName] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [analyzing, setAnalyzing] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [scanStatus, setScanStatus] = useState("");
+  const [scanError, setScanError] = useState("");
 
   useEffect(() => {
     if (!frontPhoto) {
@@ -62,11 +72,76 @@ export default function ScanPage() {
 
     return () => URL.revokeObjectURL(url);
   }, [backPhoto]);
+  async function analyzeFrontPhoto(file: File) {
+    const currentRun = analysisRun.current + 1;
+    analysisRun.current = currentRun;
 
+    setAnalyzing(true);
+    setScanProgress(0);
+    setScanStatus("Preparando o scanner...");
+    setScanError("");
+    setMessage("");
+
+    try {
+      const result = await recognizePokemonCard(file, (progress, status) => {
+        if (analysisRun.current !== currentRun) {
+          return;
+        }
+
+        setScanProgress(progress);
+        setScanStatus(status);
+      });
+
+      if (analysisRun.current !== currentRun) {
+        return;
+      }
+
+      if (result.name) {
+        setCardName(result.name);
+      }
+
+      if (result.cardNumber) {
+        setCardNumber(result.cardNumber);
+      }
+
+      if (!result.name && !result.cardNumber) {
+        setScanError(
+          "Não conseguimos identificar os dados automaticamente. Você pode preencher os campos manualmente.",
+        );
+        return;
+      }
+
+      const detectedFields = [
+        result.name ? "nome" : "",
+        result.cardNumber ? "número" : "",
+      ].filter(Boolean);
+
+      setScanProgress(100);
+      setScanStatus(
+        `${detectedFields.join(" e ")} identificado${
+          detectedFields.length > 1 ? "s" : ""
+        }. Confira os dados antes de salvar.`,
+      );
+    } catch (error) {
+      if (analysisRun.current !== currentRun) {
+        return;
+      }
+
+      setScanError(
+        error instanceof Error
+          ? `Não foi possível analisar a carta: ${error.message}`
+          : "Não foi possível analisar a carta. Preencha os dados manualmente.",
+      );
+    } finally {
+      if (analysisRun.current === currentRun) {
+        setAnalyzing(false);
+      }
+    }
+  }
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (submitting.current || success) return;
+    if (submitting.current || success || analyzing) return;
 
     setMessage("");
 
@@ -297,18 +372,69 @@ export default function ScanPage() {
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
                     onChange={(event) => {
-                      setFrontPhoto(event.target.files?.[0] || null);
+                      const file = event.target.files?.[0] || null;
+
+                      setFrontPhoto(file);
                       setMessage("");
+                      setScanStatus("");
+                      setScanError("");
+
+                      if (file) {
+                        void analyzeFrontPhoto(file);
+                      }
                     }}
                     className="mt-5 block w-full text-sm text-slate-600 file:mr-3 file:rounded-xl file:border-0 file:bg-blue-600 file:px-4 file:py-2.5 file:font-bold file:text-white hover:file:bg-blue-700"
                   />
+
                   <CardCameraScanner
-                    disabled={saving}
+                    disabled={saving || analyzing}
                     onCapture={(file) => {
                       setFrontPhoto(file);
                       setMessage("");
+                      setScanStatus("");
+                      setScanError("");
+                      void analyzeFrontPhoto(file);
                     }}
                   />
+
+                  {(analyzing || scanStatus || scanError) && (
+                    <div
+                      className={`mt-4 rounded-xl border p-4 ${
+                        scanError
+                          ? "border-red-200 bg-red-50"
+                          : "border-blue-200 bg-blue-50"
+                      }`}
+                    >
+                      {analyzing && (
+                        <div className="mb-3 h-2 overflow-hidden rounded-full bg-blue-100">
+                          <div
+                            className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                            style={{
+                              width: `${Math.max(5, scanProgress)}%`,
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      <p
+                        role={scanError ? "alert" : "status"}
+                        className={`text-sm font-semibold ${
+                          scanError ? "text-red-700" : "text-blue-700"
+                        }`}
+                      >
+                        {scanError ||
+                          scanStatus ||
+                          `Lendo a carta... ${scanProgress}%`}
+                      </p>
+
+                      {analyzing && (
+                        <p className="mt-2 text-xs text-slate-500">
+                          A primeira leitura pode demorar enquanto o
+                          reconhecimento é carregado no aparelho.
+                        </p>
+                      )}
+                    </div>
+                  )}
 
                   <div className="mt-5 flex aspect-[2.5/3.5] items-center justify-center overflow-hidden rounded-2xl border border-dashed border-blue-200 bg-blue-50/60 p-4">
                     {frontPreview ? (
@@ -394,6 +520,8 @@ export default function ScanPage() {
                     name="card_name"
                     required
                     maxLength={150}
+                    value={cardName}
+                    onChange={(event) => setCardName(event.target.value)}
                     placeholder="Ex.: Pikachu"
                     className={fieldClass}
                   />
@@ -411,6 +539,8 @@ export default function ScanPage() {
                     id="set_name"
                     name="set_name"
                     maxLength={150}
+                    value={setName}
+                    onChange={(event) => setSetName(event.target.value)}
                     placeholder="Nome da expansão"
                     className={fieldClass}
                   />
@@ -429,6 +559,8 @@ export default function ScanPage() {
                       id="card_number"
                       name="card_number"
                       maxLength={30}
+                      value={cardNumber}
+                      onChange={(event) => setCardNumber(event.target.value)}
                       placeholder="025/165"
                       className={fieldClass}
                     />
@@ -556,10 +688,14 @@ export default function ScanPage() {
 
                 <button
                   type="submit"
-                  disabled={saving}
+                  disabled={saving || analyzing}
                   className="min-h-12 w-full rounded-xl bg-blue-600 px-6 py-3 font-black text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {saving ? "Salvando carta..." : "Adicionar à coleção"}
+                  {saving
+                    ? "Salvando carta..."
+                    : analyzing
+                      ? "Identificando carta..."
+                      : "Adicionar à coleção"}
                 </button>
               </div>
             </fieldset>

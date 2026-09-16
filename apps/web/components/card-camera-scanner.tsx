@@ -119,13 +119,10 @@ export function CardCameraScanner({
     try {
       const videoWidth = video.videoWidth;
       const videoHeight = video.videoHeight;
-
-      // Proporção aproximada de uma carta Pokémon: 2,5 × 3,5.
       const cardRatio = 5 / 7;
 
       let cropHeight = videoHeight * 0.82;
       let cropWidth = cropHeight * cardRatio;
-
       const maximumWidth = videoWidth * 0.86;
 
       if (cropWidth > maximumWidth) {
@@ -135,7 +132,6 @@ export function CardCameraScanner({
 
       const sourceX = (videoWidth - cropWidth) / 2;
       const sourceY = (videoHeight - cropHeight) / 2;
-
       const canvas = document.createElement("canvas");
 
       canvas.width = 750;
@@ -215,7 +211,7 @@ export function CardCameraScanner({
         >
           <div className="flex items-center justify-between gap-4 bg-black/90 px-5 py-4 text-white">
             <div>
-              <p className="font-black">Escanear carta</p>
+              <p className="font-black">MastersTCG Scan</p>
 
               <p className="mt-1 text-xs text-white/70">
                 Centralize toda a carta dentro da moldura.
@@ -242,14 +238,29 @@ export function CardCameraScanner({
 
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/25"
+              className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-black/20"
             >
-              <div className="relative aspect-[5/7] h-[78%] max-h-[720px] rounded-2xl border-4 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.38)]">
-                <span className="absolute -left-1 -top-1 h-12 w-12 rounded-tl-2xl border-l-4 border-t-4 border-yellow-400" />
-                <span className="absolute -right-1 -top-1 h-12 w-12 rounded-tr-2xl border-r-4 border-t-4 border-yellow-400" />
-                <span className="absolute -bottom-1 -left-1 h-12 w-12 rounded-bl-2xl border-b-4 border-l-4 border-yellow-400" />
-                <span className="absolute -bottom-1 -right-1 h-12 w-12 rounded-br-2xl border-b-4 border-r-4 border-yellow-400" />
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/30 bg-[#071a4c]/90 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-white shadow-lg">
+                <span className="text-yellow-400">✦</span>
+                MastersTCG Scan
               </div>
+
+              <div className="relative aspect-[5/7] w-[72vw] max-w-[360px] overflow-hidden rounded-[24px] border-2 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.42)]">
+                <span className="absolute left-0 top-0 h-16 w-16 rounded-tl-[22px] border-l-[6px] border-t-[6px] border-yellow-400" />
+                <span className="absolute right-0 top-0 h-16 w-16 rounded-tr-[22px] border-r-[6px] border-t-[6px] border-yellow-400" />
+                <span className="absolute bottom-0 left-0 h-16 w-16 rounded-bl-[22px] border-b-[6px] border-l-[6px] border-blue-500" />
+                <span className="absolute bottom-0 right-0 h-16 w-16 rounded-br-[22px] border-b-[6px] border-r-[6px] border-blue-500" />
+
+                <div className="absolute left-4 right-4 top-1/2 h-0.5 animate-pulse bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_12px_rgba(96,165,250,1)]" />
+
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#071a4c]/85 px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-white">
+                  Mantenha a carta dentro da área
+                </div>
+              </div>
+
+              <p className="mt-4 rounded-full bg-black/60 px-4 py-2 text-center text-xs font-semibold text-white">
+                Frente da carta • sem reflexos • boa iluminação
+              </p>
             </div>
 
             {starting && (
