@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
 import { createClient } from "@/lib/supabase/client";
+import { CardCameraScanner } from "@/components/card-camera-scanner";
 
 const fieldClass =
   "mt-2 w-full rounded-xl border border-blue-200 bg-white px-4 py-3 text-[#071a4c] outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20";
@@ -295,12 +296,18 @@ export default function ScanPage() {
                     id="front_photo"
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    required
                     onChange={(event) => {
                       setFrontPhoto(event.target.files?.[0] || null);
                       setMessage("");
                     }}
                     className="mt-5 block w-full text-sm text-slate-600 file:mr-3 file:rounded-xl file:border-0 file:bg-blue-600 file:px-4 file:py-2.5 file:font-bold file:text-white hover:file:bg-blue-700"
+                  />
+                  <CardCameraScanner
+                    disabled={saving}
+                    onCapture={(file) => {
+                      setFrontPhoto(file);
+                      setMessage("");
+                    }}
                   />
 
                   <div className="mt-5 flex aspect-[2.5/3.5] items-center justify-center overflow-hidden rounded-2xl border border-dashed border-blue-200 bg-blue-50/60 p-4">
