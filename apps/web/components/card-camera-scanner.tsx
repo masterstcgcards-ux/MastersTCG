@@ -12,6 +12,7 @@ export function CardCameraScanner({
   onCapture,
 }: CardCameraScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const cameraStageRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   const [open, setOpen] = useState(false);
@@ -103,9 +104,11 @@ export function CardCameraScanner({
 
   async function capturePhoto() {
     const video = videoRef.current;
+    const cameraStage = cameraStageRef.current;
 
     if (
       !video ||
+      !cameraStage ||
       video.videoWidth === 0 ||
       video.videoHeight === 0 ||
       capturing
@@ -119,23 +122,34 @@ export function CardCameraScanner({
     try {
       const videoWidth = video.videoWidth;
       const videoHeight = video.videoHeight;
-      const cardRatio = 5 / 7;
+      const stageRatio =
+        cameraStage.clientWidth / Math.max(1, cameraStage.clientHeight);
+      const videoRatio = videoWidth / videoHeight;
 
-      let cropHeight = videoHeight * 0.82;
-      let cropWidth = cropHeight * cardRatio;
-      const maximumWidth = videoWidth * 0.86;
+      let sourceX = 0;
+      let sourceY = 0;
+      let sourceWidth = videoWidth;
+      let sourceHeight = videoHeight;
 
-      if (cropWidth > maximumWidth) {
-        cropWidth = maximumWidth;
-        cropHeight = cropWidth / cardRatio;
+      // O vídeo usa object-cover. Este cálculo captura exatamente a região
+      // que a pessoa viu na tela, sem aplicar ainda o recorte da carta.
+      if (videoRatio > stageRatio) {
+        sourceWidth = videoHeight * stageRatio;
+        sourceX = (videoWidth - sourceWidth) / 2;
+      } else {
+        sourceHeight = videoWidth / stageRatio;
+        sourceY = (videoHeight - sourceHeight) / 2;
       }
 
-      const sourceX = (videoWidth - cropWidth) / 2;
-      const sourceY = (videoHeight - cropHeight) / 2;
+      const maximumSide = 1800;
+      const scale = Math.min(
+        1,
+        maximumSide / Math.max(sourceWidth, sourceHeight),
+      );
       const canvas = document.createElement("canvas");
 
-      canvas.width = 750;
-      canvas.height = 1050;
+      canvas.width = Math.max(1, Math.round(sourceWidth * scale));
+      canvas.height = Math.max(1, Math.round(sourceHeight * scale));
 
       const context = canvas.getContext("2d");
 
@@ -147,8 +161,8 @@ export function CardCameraScanner({
         video,
         sourceX,
         sourceY,
-        cropWidth,
-        cropHeight,
+        sourceWidth,
+        sourceHeight,
         0,
         0,
         canvas.width,
@@ -163,7 +177,7 @@ export function CardCameraScanner({
         throw new Error("Não foi possível gerar a fotografia.");
       }
 
-      const file = new File([blob], `carta-frente-${Date.now()}.jpg`, {
+      const file = new File([blob], `captura-carta-${Date.now()}.jpg`, {
         type: "image/jpeg",
         lastModified: Date.now(),
       });
@@ -227,7 +241,10 @@ export function CardCameraScanner({
             </button>
           </div>
 
-          <div className="relative min-h-0 flex-1 overflow-hidden bg-black">
+          <div
+            ref={cameraStageRef}
+            className="relative min-h-0 flex-1 overflow-hidden bg-black"
+          >
             <video
               ref={videoRef}
               muted

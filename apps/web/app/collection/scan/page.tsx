@@ -7,6 +7,7 @@ import type { FormEvent } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 import { CardCameraScanner } from "@/components/card-camera-scanner";
+import { CardCropEditor } from "@/components/card-crop-editor";
 import { recognizePokemonCard } from "@/lib/card-ocr";
 
 const fieldClass =
@@ -32,6 +33,7 @@ function validateImage(file: File, imageName: string) {
 
 export default function ScanPage() {
   const [frontPhoto, setFrontPhoto] = useState<File | null>(null);
+  const [pendingCropPhoto, setPendingCropPhoto] = useState<File | null>(null);
   const [backPhoto, setBackPhoto] = useState<File | null>(null);
   const [frontPreview, setFrontPreview] = useState("");
   const [backPreview, setBackPreview] = useState("");
@@ -48,6 +50,34 @@ export default function ScanPage() {
   const [scanProgress, setScanProgress] = useState(0);
   const [scanStatus, setScanStatus] = useState("");
   const [scanError, setScanError] = useState("");
+
+  function preparePhotoForCropping(file: File | null) {
+    if (!file) return;
+
+    const validation = validateImage(file, "Foto da frente");
+
+    if (validation) {
+      setMessage(validation);
+      return;
+    }
+
+    analysisRun.current += 1;
+    setAnalyzing(false);
+    setScanProgress(0);
+    setScanStatus("");
+    setScanError("");
+    setMessage("");
+    setPendingCropPhoto(file);
+  }
+
+  function acceptCroppedPhoto(file: File) {
+    setPendingCropPhoto(null);
+    setFrontPhoto(file);
+    setMessage("");
+    setScanStatus("");
+    setScanError("");
+    void analyzeFrontPhoto(file);
+  }
 
   useEffect(() => {
     if (!frontPhoto) {
@@ -100,11 +130,15 @@ export default function ScanPage() {
         setCardName(result.name);
       }
 
+      if (result.setName) {
+        setSetName(result.setName);
+      }
+
       if (result.cardNumber) {
         setCardNumber(result.cardNumber);
       }
 
-      if (!result.name && !result.cardNumber) {
+      if (!result.name && !result.setName && !result.cardNumber) {
         setScanError(
           "Não conseguimos identificar os dados automaticamente. Você pode preencher os campos manualmente.",
         );
@@ -113,14 +147,15 @@ export default function ScanPage() {
 
       const detectedFields = [
         result.name ? "nome" : "",
+        result.setName ? "coleção" : "",
         result.cardNumber ? "número" : "",
       ].filter(Boolean);
 
       setScanProgress(100);
       setScanStatus(
-        `${detectedFields.join(" e ")} identificado${
+        `${detectedFields.join(", ")} identificado${
           detectedFields.length > 1 ? "s" : ""
-        }. Confira os dados antes de salvar.`,
+        }${result.catalogMatched ? " e confirmado(s) no catálogo" : ""}. Confira os dados antes de salvar.`,
       );
     } catch (error) {
       if (analysisRun.current !== currentRun) {
@@ -373,28 +408,15 @@ export default function ScanPage() {
                     accept="image/jpeg,image/png,image/webp"
                     onChange={(event) => {
                       const file = event.target.files?.[0] || null;
-
-                      setFrontPhoto(file);
-                      setMessage("");
-                      setScanStatus("");
-                      setScanError("");
-
-                      if (file) {
-                        void analyzeFrontPhoto(file);
-                      }
+                      preparePhotoForCropping(file);
+                      event.currentTarget.value = "";
                     }}
                     className="mt-5 block w-full text-sm text-slate-600 file:mr-3 file:rounded-xl file:border-0 file:bg-blue-600 file:px-4 file:py-2.5 file:font-bold file:text-white hover:file:bg-blue-700"
                   />
 
                   <CardCameraScanner
                     disabled={saving || analyzing}
-                    onCapture={(file) => {
-                      setFrontPhoto(file);
-                      setMessage("");
-                      setScanStatus("");
-                      setScanError("");
-                      void analyzeFrontPhoto(file);
-                    }}
+                    onCapture={preparePhotoForCropping}
                   />
 
                   {(analyzing || scanStatus || scanError) && (
@@ -436,13 +458,13 @@ export default function ScanPage() {
                     </div>
                   )}
 
-                  <div className="mt-5 flex aspect-[2.5/3.5] items-center justify-center overflow-hidden rounded-2xl border border-dashed border-blue-200 bg-blue-50/60 p-4">
+                  <div className="mt-5 flex aspect-[2.5/3.5] items-center justify-center overflow-hidden rounded-2xl border border-blue-200 bg-blue-50/60 shadow-lg">
                     {frontPreview ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={frontPreview}
                         alt="Prévia da frente da carta"
-                        className="h-full w-full rounded-xl object-contain"
+                        className="h-full w-full object-contain"
                       />
                     ) : (
                       <div className="text-center">
@@ -702,6 +724,14 @@ export default function ScanPage() {
           </form>
         )}
       </section>
+
+      {pendingCropPhoto && (
+        <CardCropEditor
+          file={pendingCropPhoto}
+          onCancel={() => setPendingCropPhoto(null)}
+          onConfirm={acceptCroppedPhoto}
+        />
+      )}
     </main>
   );
 }
